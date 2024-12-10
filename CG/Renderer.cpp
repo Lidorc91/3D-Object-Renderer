@@ -24,3 +24,7 @@ void Renderer::drawPixels(const std::vector<Pixel>& pixels)
 
 	glDrawArrays(GL_POINTS, 0, numPixels);
 }
+
+//Turn on/off world/object coordinate
+
+//Add viewport transform (center camera)
