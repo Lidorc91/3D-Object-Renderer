@@ -17,14 +17,21 @@
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
-
+#include "Scene.h"
 
 LARGE_INTEGER StartingTime, EndingTime, ElapsedMicroseconds;
 LARGE_INTEGER Frequency;
 
 double g_Scale = 1.0;
 //double g_quaternion[4] = {0.0, 0.0, 0.0, 1.0};
-
+double g_TranslateX = 0.0;
+double g_TranslateY = 0.0;
+double g_TranslateZ = 0.0;
+double g_RotateX = 0.0;
+double g_RotateY = 0.0;
+double g_RotateZ = 0.0; 
+//Create scene
+Scene myScene = Scene();
 //points coordinates
 int g_P1x = 200, g_P1y = 200; //P1
 int g_P2x = 500, g_P2y = 400; //P2
@@ -76,6 +83,7 @@ void Terminate(void);
 
 int main(int argc, char* argv[])
 {
+
 	// Initialize openGL, glut, glew
 	initGraphics(argc, argv);
 	// Initialize AntTweakBar
@@ -124,7 +132,14 @@ int main(int argc, char* argv[])
 
 	TwAddButton(bar, "open", loadOBJModel, NULL, " label='Open OBJ File...' ");
 
-
+	//add 'g_Scale' to 'bar': this is a modifiable (RW) variable of type TW_TYPE_DOUBLE. Its key shortcuts are [s] and [S].
+	TwAddVarRW(bar, "Scale", TW_TYPE_DOUBLE, &g_Scale, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Scale the object (1=original size).' ");
+	TwAddVarRW(bar, "TranslateX", TW_TYPE_DOUBLE, &g_TranslateX, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Translate the object in X-axis (0=original size).' ");
+	TwAddVarRW(bar, "TranslateY", TW_TYPE_DOUBLE, &g_TranslateY, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Y-axis (0=original size).' ");
+	TwAddVarRW(bar, "TranslateZ", TW_TYPE_DOUBLE, &g_TranslateZ, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Z-axis (0=original size).' ");
+	TwAddVarRW(bar, "RotateX", TW_TYPE_DOUBLE, &g_RotateX, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around X-axis (0=original size).' ");
+	TwAddVarRW(bar, "RotateY", TW_TYPE_DOUBLE, &g_RotateY, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Y-axis (0=original size).' ");
+	TwAddVarRW(bar, "RotateZ", TW_TYPE_DOUBLE, &g_RotateZ, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Z-axis (0=original size).' ");
 
 	// Call the GLUT main loop
 	glutMainLoop();
@@ -132,11 +147,14 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
+void callTransform() {
 
+}
 void TW_CALL loadOBJModel(void* data)
 {
-	std::wstring str = getOpenFileName();
 
+	std::wstring str = getOpenFileName();
+	
 	bool result = objScene.load_file(str);
 
 	if (result)
@@ -146,7 +164,13 @@ void TW_CALL loadOBJModel(void* data)
 	else
 	{
 		std::cerr << "Failed to load obj file" << std::endl;
+		return;
 	}
+
+	//create object on heap
+	Object* obj = new Object(objScene);
+	//Add object to scene
+	myScene.addObject(*obj);
 
 	std::cout << "The number of vertices in the model is: " << objScene.m_points.size() << std::endl;
 	std::cout << "The number of triangles in the model is: " << objScene.m_faces.size() << std::endl;
@@ -446,6 +470,10 @@ void Special(int k, int x, int y)
 // Function called at exit
 void Terminate(void)
 {
+	//delete objects from heap
+	for (Object object : myScene.getObjects()) {
+		delete &object;
+	}
 	TwTerminate();
 }
 
