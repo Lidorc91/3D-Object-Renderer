@@ -31,7 +31,7 @@ double g_RotateX = 0.0;
 double g_RotateY = 0.0;
 double g_RotateZ = 0.0; 
 //Create scene
-Scene myScene = Scene();
+Scene myScene = Scene(1920,1080);
 //points coordinates
 int g_P1x = 200, g_P1y = 200; //P1
 int g_P2x = 500, g_P2y = 400; //P2

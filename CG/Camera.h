@@ -9,24 +9,24 @@
 
 class Camera {
 public:
-	Camera();
+	Camera(float aspectRatio);
 	void RepositionCamera(const glm::vec3& eye, const glm::vec3& center, const glm::vec3& up);
 	void UpdateViewer();
+	void UpdatePerspective(float near, float far, float fov, float aspect);
 
+	glm::mat4 _viewMatrix; //position in world
+	glm::mat4 _projectionMatrix; //Distort (perspective->orthogonal) and Project 
 private:
 	//View Matrix
-	glm::vec3 _eye, _center, _up;
-	glm::mat4 _viewMatrix;
+	glm::vec3 _eye, _center, _up;	
 
 	//Perspective Matrix (NDC)
-	float fov;        // Field of view in radians
-	float aspect;     // Aspect ratio 
-	float near;       // Near clipping plane
-	float far;		  // Far clipping plane
+	float _near = 0.1f;  // Near clipping plane
+	float _far = 1000.0f;  // Far clipping plane
+	float _fov = glm::radians(45.0f);  // Field of View in radians
+	static float _aspectRatio;  // Screen aspect ratio
 
-	glm::mat4 projectionMatrix = glm::perspective(fov, aspect, near, far);
+	//glm::mat4 _projectionMatrix = glm::perspective(fov, aspect, near, far);
 
-	//Screen coordinates
-	viewportTransform(glm::vec4 ndc, float width, float height)
 };
 
