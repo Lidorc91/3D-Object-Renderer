@@ -6,10 +6,20 @@
 	//Add WORLD transoformations
 
 
-	// Constructor
+	//Constructor
 	Scene::Scene() : _objects(), _cameras() {
 		Camera* c = new Camera();
 		_viewer = c;
+	}
+
+	//Destructor
+	Scene::~Scene() {
+		for each (Object & object in _objects) {
+			delete &object;
+		}
+		for each (Camera & camera in _cameras) {
+			delete &camera;
+		}
 	}
 
 	// Add an object to the scene
@@ -27,7 +37,7 @@
 		
 		for each (const Object & object in _objects) {
 			//calculate Model-View Matrix
-			//_ModelViewMatrix = _viewportMatrix * _viewer->_viewMatrix * object._modelMatrix;
+			//_ModelViewMatrix = _viewportMatrix * _projectionMAtrix *_viewer->_viewMatrix * object._modelMatrix;
 
 		}
 	}
