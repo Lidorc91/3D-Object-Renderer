@@ -1,16 +1,15 @@
 #include "Camera.h"
 
 //Lookat -> Projection -> Viewport
-Camera::Camera(float aspect) : _viewMatrix(1.0f), _eye(0.0f, 0.0f, 1.0f), _center(0.0f, 0.0f, 0.0f), _up(0.0f, 1.0f, 0.0f) {
+Camera::Camera() : _viewMatrix(1.0f), _eye(0.0f, 0.0f, 1.0f), _target(0.0f, 0.0f, 0.0f), _up(0.0f, 1.0f, 0.0f) {
 	UpdateViewer();
-	void UpdatePerspective(float _near, float _far, float _fov, float _aspectRatio);
-	_aspectRatio = aspect;
+	UpdatePerspective(_near, _far, _fov, _aspectRatio);	
 }
 
-void Camera::RepositionCamera(const glm::vec3& eye, const glm::vec3& center, const glm::vec3& up) {
+void Camera::RepositionCamera(const glm::vec3& eye, const glm::vec3& target, const glm::vec3& up) {
 	//Get new parameters
 	_eye = eye;
-	_center = center;
+	_target = target;
 	_up = up;
 	//Recenter - Use Lookat function
 	UpdateViewer();
@@ -20,7 +19,7 @@ void Camera::UpdateViewer() {
 	//constrcut the LookAt matrix
 	/*
 	//view_matrix paramteres
-	glm::vec3 forward = glm::normalize(_center - _eye);
+	glm::vec3 forward = glm::normalize(_target - _eye);
 	glm::vec3 right = glm::normalize(glm::cross(forward, _up));
 	glm::vec3 trueUp = glm::cross(right, forward);
 
@@ -39,11 +38,15 @@ void Camera::UpdateViewer() {
 	_viewMatrix = rotation * translation;
 	*/
 
-	_viewMatrix = glm::lookAt(_eye, _center, _up);
+	_viewMatrix = glm::lookAt(_eye, _target, _up);
 }
 
 void Camera::UpdatePerspective(float near, float far, float fov, float aspect){
-	//
+	//convert to radians
+	_fov = glm::radians(fov);
+
+	_projectionMatrix = glm::perspective(_fov, aspect, near, far);
+	/*
 	float top = near * tan(fov / 2.0f);  // Top of the frustum
 	float right = top * aspect;        // Right of the frustum
 
@@ -52,5 +55,6 @@ void Camera::UpdatePerspective(float near, float far, float fov, float aspect){
 	_projectionMatrix[2][2] = -(far + near) / (far - near);  // Scale Z
 	_projectionMatrix[2][3] = -1.0f;  // Perspective divide
 	_projectionMatrix[3][2] = -(2.0f * far * near) / (far - near);  // Translate Z
+	*/
 
 }

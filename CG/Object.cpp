@@ -5,7 +5,7 @@
 	//Object creation
 	Object::Object(Wavefront_obj& wf) : _modelMatrix(1.0f), _translationMatrix(1.0f), _rotationMatrix(1.0f), _scaleMatrix(1.0f) {
 		//Intialize meshmodel
-		_meshModel = MeshModel();
+		_meshModel = MeshModel(wf);
 		//Create Bbox and calculate center
 		_box = BBox(wf);
 		TransferToWorldFrame(wf);
@@ -13,6 +13,7 @@
 		Scale(10);
 		Transform();
 		_scaleMatrix = (1.0f);
+		std::cout << "Object Created" << std::endl;
 	}
 
 	//Add OBJECT transformations
@@ -34,7 +35,8 @@
 	void Object::Translate(float x, float y, float z) {
 		_translationMatrix[3] = glm::vec4(x, y, z, 1.0f);
 	}
-	void Object::Rotate(float x, float y, float z) {
+
+	void Object::Rotate(float x, float y, float z) { // TODO - Change to switch case (can only pick 1 axis at a time w/ amount of rotation)
 		glm::mat4 rotateX(float x);
 		glm::mat4 rotateY(float y);
 		glm::mat4 rotateZ(float z);
@@ -69,29 +71,19 @@
 
 	//Bring obj coordinates to World frame (recenter) + Normalize coordinates + add obj coordinates + homogenous coordinates to meshmodel
 	void Object::TransferToWorldFrame(Wavefront_obj& wf) {
-		for each (const Wavefront_obj::Vector& point in wf.m_points)
-		{			
-			glm::vec4 newVec;
-			//recenter point + normalize
-			newVec.x = point[0] - _box.getCenter().x;
-			newVec.x /= abs(_box.getMax().x - _box.getCenter().x);
-
-			newVec.y = point[1] - _box.getCenter().y;
-			newVec.y /= abs(_box.getMax().y - _box.getCenter().y);
-
-			newVec.z = point[2] - _box.getCenter().z;
-			newVec.z /= abs(_box.getMax().z - _box.getCenter().z);
-
-			//create homogenous coordinate
-			newVec.w = 1;
-			//add point to Meshmodel
-			_meshModel._points.push_back(newVec);
+		for (glm::vec4& point : _meshModel._points)
+		{		
+			//recenter point
+			point.x -= _box.getCenter().x;
+			point.y -= _box.getCenter().y;
+			point.z -= _box.getCenter().z;
+			
+			//normalize
+			point.x = (abs(_box.getMax().x - _box.getCenter().x) == 0) ? point.x : point.x / abs(_box.getMax().x - _box.getCenter().x);
+			point.y = (abs(_box.getMax().y - _box.getCenter().y) == 0) ? point.y : point.y / abs(_box.getMax().y - _box.getCenter().y);
+			point.z = (abs(_box.getMax().z - _box.getCenter().z) == 0) ? point.z : point.z / abs(_box.getMax().z - _box.getCenter().z);
 		}
-		for each (const Wavefront_obj::Face& face in wf.m_faces)
-		{
-			glm::vec3 newFace(face.v[0], face.v[1], face.v[2]);  
-			_meshModel._faces.push_back(newFace);
-		}
+
 	}
 
 	void Object::ResetMatrices() {

@@ -31,7 +31,9 @@ double g_RotateX = 0.0;
 double g_RotateY = 0.0;
 double g_RotateZ = 0.0; 
 //Create scene
-Scene myScene = Scene(1920,1080);
+Scene myScene = Scene();
+//Create renderer
+Renderer renderer = Renderer();
 //points coordinates
 int g_P1x = 200, g_P1y = 200; //P1
 int g_P2x = 500, g_P2y = 400; //P2
@@ -167,11 +169,15 @@ void TW_CALL loadOBJModel(void* data)
 		return;
 	}
 
-	//create object on heap
-	Object* obj = new Object(objScene);
+	//create object
+	Object obj(objScene);
 	//Add object to scene
-	myScene.addObject(*obj);
-
+	myScene.addObject(obj);
+	//Generate scene
+	myScene.GenerateScene();
+	//Draw scene
+	renderer.RenderScene(myScene);
+	//myScene.DrawScene();
 	std::cout << "The number of vertices in the model is: " << objScene.m_points.size() << std::endl;
 	std::cout << "The number of triangles in the model is: " << objScene.m_faces.size() << std::endl;
 }
@@ -423,8 +429,9 @@ void Reshape(int width, int height)
 
 	//////////////////////////////////////
 	///////add your reshape code here/////////////
-
-
+	//myScene._viewer->_aspectRatio = width / height;
+	//renderer._screenWidth = width;
+	//renderer._screenHeight = height;
 
 	//////////////////////////////////////
 
@@ -470,10 +477,6 @@ void Special(int k, int x, int y)
 // Function called at exit
 void Terminate(void)
 {
-	//delete objects from heap
-	for (Object object : myScene.getObjects()) {
-		delete &object;
-	}
 	TwTerminate();
 }
 
