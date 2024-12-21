@@ -22,12 +22,16 @@ void Renderer::RenderScene(Scene& scene) {
 	*/
 	//Calculate Viewport Matrix
 	CalculateViewPortMatrix();
+	//Generate Scene Matrix - FOR 1 OBJECT ONLY !! UPDATE FOR MULTIPLE
+	glm::mat4 SceneMatrix = scene.GenerateScene();
 	//Adjust to Viewport
 	for (Object& obj : scene.getObjects()) {
 		//Transform each point
 		for (glm::vec4& point : obj._meshModel._points) {
 			//Viewport Transform
-			point = _viewportMatrix * point;
+			point = _viewportMatrix * SceneMatrix * point;
+			//Perspective Divide
+			point /= point.w;
 		}
 	}
 	//Render scene	

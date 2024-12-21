@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <freeglut/include/GL/freeglut.h>
-//#include "Object.h"
 #include "Scene.h"
 
 struct Pixel

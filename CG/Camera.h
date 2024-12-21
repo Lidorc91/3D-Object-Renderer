@@ -25,12 +25,7 @@ private:
 	float _near = 0.1f;  // Near clipping plane
 	float _far = 1000.0f;  // Far clipping plane
 	float _fov = glm::radians(45.0f);  // Field of View in radians
-	
 
-	//Viewport Matrix
-	glm::mat4 _viewportMatrix;
-	float _top;
-	float _right;
 
 	//glm::mat4 _projectionMatrix = glm::perspective(fov, aspect, near, far);
 	

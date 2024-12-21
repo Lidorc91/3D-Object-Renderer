@@ -25,8 +25,11 @@
 		_cameras.push_back(cam);
 	}
 
-	//Draw scene
-	void Scene::GenerateScene() {
+	//Generate ALL transformations (before viewport transformations)
+	glm::mat4 Scene::GenerateScene() {
+		//curently for 1 object only !
+		glm::mat4 SceneMatrix = _viewer->_projectionMatrix * _viewer->_viewMatrix * this->_objects.at(0)._modelMatrix;
+		/*
 		glm::mat4 ViewMatrix = _viewer->_projectionMatrix * _viewer->_viewMatrix;
 		for(Object& object : _objects) {
 			//calculate Model-View Matrix
@@ -43,6 +46,8 @@
 				point = newPoint;
 			}
 		}
+		*/
+		return SceneMatrix;
 	}
 
 	std::vector<Object>& Scene::getObjects() {

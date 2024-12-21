@@ -17,7 +17,8 @@ public:
     ~Scene();
     void addObject(Object& obj);
     void addCamera(Camera& cam);
-    void GenerateScene();
+    glm::mat4 GenerateScene();
+    //std::vector<glm::mat4> Transformations; ADD WHEN IMPLEMENTING MULTIPLE OBJECTS
     std::vector<Object>& getObjects();
 
 private:
