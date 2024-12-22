@@ -20,9 +20,7 @@ public:
 	void RenderScene(Scene& scene);
 	void drawPixels(const std::vector<Pixel>& pixels);
 	void drawLine(int x1, int y1, int x2, int y2, std::vector<Pixel>& pixels);
-	void CalculateViewPortMatrix();
-	static float _screenWidth;
-	static float _screenHeight;
+	void CalculateViewPortMatrix(int width, int height);
 	glm::mat4 _viewportMatrix;
 
 private:

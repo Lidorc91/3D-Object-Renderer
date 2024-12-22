@@ -13,7 +13,7 @@ public:
 	void RepositionCamera(const glm::vec3& eye, const glm::vec3& center, const glm::vec3& up);
 	void UpdateViewer();
 	void UpdatePerspective(float near, float far, float fov, float aspect);
-
+	void UpdateAspectRatio(float aspect) { _aspectRatio = aspect; UpdatePerspective(_near, _far, _fov, _aspectRatio); } //Update on Window Resize
 	glm::mat4 _viewMatrix; //position in world
 	glm::mat4 _projectionMatrix; //Distort (perspective->orthogonal) and Project 
 	float _aspectRatio;  // Screen aspect ratio
@@ -24,7 +24,7 @@ private:
 	//Perspective Matrix (NDC)
 	float _near = 0.1f;  // Near clipping plane
 	float _far = 1000.0f;  // Far clipping plane
-	float _fov = glm::radians(45.0f);  // Field of View in radians
+	float _fov = 45.0f;  // Field of View
 
 
 	//glm::mat4 _projectionMatrix = glm::perspective(fov, aspect, near, far);

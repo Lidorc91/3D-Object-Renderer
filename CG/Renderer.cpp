@@ -1,8 +1,7 @@
 #include "Renderer.h"
 #include <iostream>
 
-float Renderer::_screenWidth = 0;
-float Renderer::_screenHeight = 0;
+
 
 Renderer::Renderer() : _viewportMatrix(1.0f), _pixels()
 {
@@ -21,7 +20,7 @@ void Renderer::RenderScene(Scene& scene) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	*/
 	//Calculate Viewport Matrix
-	CalculateViewPortMatrix();
+	//CalculateViewPortMatrix();
 	//Generate Scene Matrix - FOR 1 OBJECT ONLY !! UPDATE FOR MULTIPLE
 	glm::mat4 SceneMatrix = scene.GenerateScene();
 	//Adjust to Viewport
@@ -38,18 +37,25 @@ void Renderer::RenderScene(Scene& scene) {
 	for (Object& obj : scene.getObjects()) {
 		RenderObject(obj);
 	}
+	
+
 	/*
 	//Draw tweak bars
 	TwDraw();
 	//Swap back and front frame buffers
 	glutSwapBuffers();
 	*/
+
 }
 void Renderer::RenderObject(const Object& obj) {
 	for(const pair<int, int> edge : obj._meshModel._edges) {
+		//Create Integers for points
+		int x1 = static_cast<int>(std::round(obj._meshModel._points[edge.first].x));
+		int y1 = static_cast<int>(std::round(obj._meshModel._points[edge.first].y));
+		int x2 = static_cast<int>(std::round(obj._meshModel._points[edge.second].x));
+		int y2 = static_cast<int>(std::round(obj._meshModel._points[edge.second].y));
 		//Draw line between points
-		drawLine(obj._meshModel._points[edge.first].x, obj._meshModel._points[edge.first].y,
-			obj._meshModel._points[edge.second].x, obj._meshModel._points[edge.second].y, _pixels);
+		drawLine(x1,y1,x2,y2, _pixels);
 	}
 	drawPixels(_pixels);
 	std::cout << "Object Rendered" << std::endl;
@@ -92,9 +98,9 @@ void Renderer::drawPixels(const std::vector<Pixel>& pixels)
 
 //Add viewport transform (center camera)
 
-void Renderer::CalculateViewPortMatrix() {
-	float halfWidth = _screenWidth / 2.0f;
-	float halfHeight = _screenHeight / 2.0f;
+void Renderer::CalculateViewPortMatrix(int width, int height) {
+	float halfWidth = width / 2.0f;
+	float halfHeight = height / 2.0f;
 
 	_viewportMatrix[0][0] = halfWidth;  // Scale X
 	_viewportMatrix[1][1] = halfHeight; // Scale Y

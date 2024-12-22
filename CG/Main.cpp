@@ -174,9 +174,9 @@ void TW_CALL loadOBJModel(void* data)
 	//Add object to scene
 	myScene.addObject(obj);
 	//Generate scene
-	myScene.GenerateScene();
+	//myScene.GenerateScene();
 	//Draw scene
-	renderer.RenderScene(myScene);
+	//renderer.RenderScene(myScene);
 	//myScene.DrawScene();
 	std::cout << "The number of vertices in the model is: " << objScene.m_points.size() << std::endl;
 	std::cout << "The number of triangles in the model is: " << objScene.m_faces.size() << std::endl;
@@ -405,8 +405,11 @@ void Display()
 
 	//time measuring - don't delete
 	QueryPerformanceCounter(&StartingTime);
-
-	drawScene();
+	if (myScene._objects.size() > 0)
+		renderer.RenderScene(myScene);
+	else {
+		drawScene();
+	}
 
 	//time measuring - don't delete
 	QueryPerformanceCounter(&EndingTime);
@@ -429,9 +432,11 @@ void Reshape(int width, int height)
 
 	//////////////////////////////////////
 	///////add your reshape code here/////////////
-	//myScene._viewer->_aspectRatio = width / height;
-	//renderer._screenWidth = width;
-	//renderer._screenHeight = height;
+
+	//Update the aspect ratio for camera projection matrix
+	myScene._viewer->UpdateAspectRatio(width/height);
+	//Update the viewport matrix
+	renderer.CalculateViewPortMatrix(width, height);
 
 	//////////////////////////////////////
 
