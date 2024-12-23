@@ -11,8 +11,7 @@
 		TransferToWorldFrame(wf);
 		//Isotropic scale by 10
 		Scale(10);
-		Transform();
-		_scaleMatrix = (1.0f);
+		_modelMatrix = _translationMatrix * _rotationMatrix * _scaleMatrix;
 		std::cout << "Object Created" << std::endl;
 	}
 
@@ -31,15 +30,21 @@
 			0, s, 0, 0,
 			0, 0, s, 0,
 			0, 0, 0, 1);
+
+		//Update BBox
 	}
 	void Object::Translate(float x, float y, float z) {
 		_translationMatrix[3] = glm::vec4(x, y, z, 1.0f);
+
+		//Update BBox
 	}
 
 	void Object::Rotate(float x, float y, float z) { // TODO - Change to switch case (can only pick 1 axis at a time w/ amount of rotation)
 		glm::mat4 rotateX(float x);
 		glm::mat4 rotateY(float y);
 		glm::mat4 rotateZ(float z);
+
+		//Update BBox
 	}
 
 	// Create rotation matrix around X-axis

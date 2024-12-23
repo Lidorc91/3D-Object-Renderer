@@ -27,6 +27,9 @@ void Renderer::RenderScene(Scene& scene) {
 	for (Object& obj : scene.getObjects()) {
 		//Transform each point
 		for (glm::vec4& point : obj._meshModel._points) {
+			point = SceneMatrix * point;
+			point /= point.w;
+			
 			//Viewport Transform
 			point = _viewportMatrix * SceneMatrix * point;
 			//Perspective Divide

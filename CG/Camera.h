@@ -14,6 +14,7 @@ public:
 	void UpdateViewer();
 	void UpdatePerspective(float near, float far, float fov, float aspect);
 	void UpdateAspectRatio(float aspect) { _aspectRatio = aspect; UpdatePerspective(_near, _far, _fov, _aspectRatio); } //Update on Window Resize
+	void ResetMatrices() { _viewMatrix = glm::mat4(1.0f); _projectionMatrix = glm::mat4(1.0f); }
 	glm::mat4 _viewMatrix; //position in world
 	glm::mat4 _projectionMatrix; //Distort (perspective->orthogonal) and Project 
 	float _aspectRatio;  // Screen aspect ratio

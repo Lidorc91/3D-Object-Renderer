@@ -43,9 +43,13 @@ void Camera::UpdateViewer() {
 
 void Camera::UpdatePerspective(float near, float far, float fov, float aspect){
 	//convert to radians
+
+	/*
 	_fov = glm::radians(fov);
 
 	_projectionMatrix = glm::perspective(_fov, aspect, near, far);
+	*/
+
 	/*
 	float top = near * tan(fov / 2.0f);  // Top of the frustum
 	float right = top * aspect;        // Right of the frustum
@@ -56,5 +60,14 @@ void Camera::UpdatePerspective(float near, float far, float fov, float aspect){
 	_projectionMatrix[2][3] = -1.0f;  // Perspective divide
 	_projectionMatrix[3][2] = -(2.0f * far * near) / (far - near);  // Translate Z
 	*/
+
+
+	float _top = 1;
+	float _right = 1;
+
+	_projectionMatrix = glm::mat4x4(_near / _right, 0.0f, 0.0f, 0.0f,//first column
+		0.0f, _near / _top, 0.0f, 0.0f,//second column
+		0.0f, 0.0f, -float((_far + _near)) / float((_far - _near)), -1.0f,//third column
+		0.0f, 0.0f, (-2 * float(_far * _near)) / float((_far - _near)), 0.0f);
 
 }

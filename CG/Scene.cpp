@@ -47,6 +47,10 @@
 			}
 		}
 		*/
+		//Reset Matrices for object and camera
+		this->_objects.at(0).ResetMatrices();
+		this->_cameras.at(0).ResetMatrices();
+
 		return SceneMatrix;
 	}
 
