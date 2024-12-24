@@ -36,6 +36,7 @@ void Renderer::RenderScene(Scene& scene) {
 	//Render scene	
 	for (Object& obj : scene.getObjects()) {
 		RenderObject(obj);
+		//DrawBBox(obj._box);
 	}
 	
 
@@ -59,6 +60,23 @@ void Renderer::RenderObject(const Object& obj) {
 	}
 	drawPixels(_pixels);
 	std::cout << "Object Rendered" << std::endl;
+}
+
+void Renderer::DrawBBox(BBox& box) {
+	//Create points for BBox
+	std::vector<std::pair<int, int>> points;
+
+	points.push_back({ static_cast<int>(std::round(box._min.x)), static_cast<int>(std::round(box._max.x)) });
+	points.push_back({ static_cast<int>(std::round(box._min.y)), static_cast<int>(std::round(box._max.y)) });
+	points.push_back({ static_cast<int>(std::round(box._min.z)), static_cast<int>(std::round(box._max.z)) });
+	//Draw BBox
+	for (int i = 0; i < points.size() - 1; i++) {
+
+		drawLine(points[i].first, points[i].second, points[i + 1].first, points[i + 1].second, _pixels);
+	}
+	drawPixels(_pixels);
+	std::cout << "BBox Rendered" << std::endl;
+	
 }
 
 void Renderer::drawLine(int x1, int y1, int x2, int y2, std::vector<Pixel>& pixels) {

@@ -18,6 +18,7 @@ public:
 
 	void RenderObject(const Object& obj);
 	void RenderScene(Scene& scene);
+	void DrawBBox(BBox& box);
 	void drawPixels(const std::vector<Pixel>& pixels);
 	void drawLine(int x1, int y1, int x2, int y2, std::vector<Pixel>& pixels);
 	void CalculateViewPortMatrix(int width, int height);
