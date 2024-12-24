@@ -5,7 +5,7 @@
 
 Renderer::Renderer() : _viewportMatrix(1.0f), _pixels()
 {
-	_pixels.reserve(100000000);
+	_pixels.reserve(1000000);
 }
 
 
@@ -30,7 +30,7 @@ void Renderer::RenderScene(Scene& scene) {
 			//Viewport Transform
 			point = _viewportMatrix * SceneMatrix * point;
 			//Perspective Divide
-			point /= point.w;
+			point = (point.w == 0) ? point : point/point.w;
 		}
 	}
 	//Render scene	

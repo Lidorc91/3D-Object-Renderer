@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 //Lookat -> Projection -> Viewport
-Camera::Camera() : _viewMatrix(1.0f), _eye(0.0f, 0.0f, 5.0f), _target(0.0f, 0.0f, 0.0f), _up(0.0f, 1.0f, 0.0f) {
+Camera::Camera() : _viewMatrix(1.0f), _eye(0.0f, 0.0f, 15.0f), _target(0.0f, 0.0f, 0.0f), _up(0.0f, 1.0f, 0.0f) {
 	UpdateViewer();
 	//UpdatePerspective(_near, _far, _fov, _aspectRatio);	
 }
@@ -64,10 +64,16 @@ void Camera::UpdatePerspective(float near, float far, float fov, float aspect){
 
 	float _top = 1;
 	float _right = 1;
-
+	/*
 	_projectionMatrix = glm::mat4x4(_near / _right, 0.0f, 0.0f, 0.0f,//first column
 		0.0f, _near / _top, 0.0f, 0.0f,//second column
 		0.0f, 0.0f, -float((_far + _near)) / float((_far - _near)), -1.0f,//third column
 		0.0f, 0.0f, (-2 * float(_far * _near)) / float((_far - _near)), 0.0f);
+		*/
+
+	_projectionMatrix = glm::mat4x4(_near / _right, 0.0f, 0.0f, 0.0f,//first column
+		0.0f, _near / _top, 0.0f, 0.0f,//second column
+		0.0f, 0.0f, -float((_far + _near)) / float((_far - _near)), (-2 * float(_far * _near)) / float((_far - _near)),//third column
+		0.0f, 0.0f,-1.0f , 0.0f);
 
 }
