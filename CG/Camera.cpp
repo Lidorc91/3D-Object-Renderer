@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 //Lookat -> Projection -> Viewport
-Camera::Camera() : _viewMatrix(1.0f), _eye(0.0f, 0.0f, 1.0f), _target(0.0f, 0.0f, 0.0f), _up(0.0f, 1.0f, 0.0f) {
+Camera::Camera() : _viewMatrix(1.0f), _eye(0.0f, 0.0f, 5.0f), _target(0.0f, 0.0f, 0.0f), _up(0.0f, 1.0f, 0.0f) {
 	UpdateViewer();
 	//UpdatePerspective(_near, _far, _fov, _aspectRatio);	
 }

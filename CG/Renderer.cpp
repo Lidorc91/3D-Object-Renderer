@@ -5,7 +5,7 @@
 
 Renderer::Renderer() : _viewportMatrix(1.0f), _pixels()
 {
-	_pixels.reserve(10000000);
+	_pixels.reserve(100000000);
 }
 
 
@@ -26,10 +26,7 @@ void Renderer::RenderScene(Scene& scene) {
 	//Adjust to Viewport
 	for (Object& obj : scene.getObjects()) {
 		//Transform each point
-		for (glm::vec4& point : obj._meshModel._points) {
-			point = SceneMatrix * point;
-			point /= point.w;
-			
+		for (glm::vec4& point : obj._meshModel._points) {			
 			//Viewport Transform
 			point = _viewportMatrix * SceneMatrix * point;
 			//Perspective Divide
