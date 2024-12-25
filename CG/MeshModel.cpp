@@ -29,7 +29,7 @@
 			//associate normal with relevant face
 			std::array<int, 3> x = { face.v[0], face.v[1], face.v[2] };
 			_normals.push_back({ x,normal });			
-		}		
+		}
 	}
 
 

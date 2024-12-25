@@ -11,6 +11,9 @@ public:
 	glm::vec3 _min;
 	glm::vec3 _center;
 
+	std::vector<glm::vec4> _boxPoints;
+	std::set<pair<int, int>> _boxEdges;
+
 	BBox();
 	BBox::BBox(Wavefront_obj& wf);
 	void UpdateCenter(MeshModel& model);	
@@ -21,4 +24,6 @@ public:
 	glm::vec3 getMin() const;
 private:
 	void UpdateCenter();
+	void GeneratePoints();
+	void GenerateEdges();
 };

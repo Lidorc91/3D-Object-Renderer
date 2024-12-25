@@ -13,16 +13,20 @@ struct Pixel
 class Renderer
 {
 public:
+	glm::mat4 _viewportMatrix;
+	bool printBox = true;
+
 	Renderer();
 	~Renderer();
 
-	void RenderObject(const Object& obj);
 	void RenderScene(Scene& scene);
-	void DrawBBox(BBox& box);
-	void drawPixels(const std::vector<Pixel>& pixels);
+	void RenderObject(const Object& obj);
+	void RenderBox(const Object& obj);
+
 	void drawLine(int x1, int y1, int x2, int y2, std::vector<Pixel>& pixels);
+	void drawPixels(const std::vector<Pixel>& pixels);
+	
 	void CalculateViewPortMatrix(int width, int height);
-	glm::mat4 _viewportMatrix;
 
 private:
 	std::vector<Pixel> _pixels;
