@@ -184,11 +184,7 @@ void TW_CALL loadOBJModel(void* data)
 	Object obj(objScene);
 	//Add object to scene
 	myScene.addObject(obj);
-	//Generate scene
-	//myScene.GenerateScene();
-	//Draw scene
-	//renderer.RenderScene(myScene);
-	//myScene.DrawScene();
+
 	std::cout << "The number of vertices in the model is: " << objScene.m_points.size() << std::endl;
 	std::cout << "The number of triangles in the model is: " << objScene.m_faces.size() << std::endl;
 }

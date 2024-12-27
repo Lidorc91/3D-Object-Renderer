@@ -11,8 +11,8 @@
 		//Bring obj coordinates to World frame (recenter) + Normalize coordinates + add obj coordinates + homogenous coordinates to meshmodel
 		RecenterAndNormalize(wf);
 		//Isotropic scale by 10
-		//Scale(10);
-		//Transform();
+		Scale(5);
+		Transform();
 		std::cout << "Object Created" << std::endl;
 	}
 
@@ -90,20 +90,6 @@
 				vertex.w = 1.0f;
 			}
 		}
-		/*
-		for (glm::vec4& point : _meshModel._points)
-		{		
-			//recenter point
-			point.x -= _box.getCenter().x;
-			point.y -= _box.getCenter().y;
-			point.z -= _box.getCenter().z;
-			
-			//normalize
-			point.x = (abs(_box.getMax().x - _box.getCenter().x) == 0) ? point.x : point.x / abs(_box.getMax().x - _box.getCenter().x);
-			point.y = (abs(_box.getMax().y - _box.getCenter().y) == 0) ? point.y : point.y / abs(_box.getMax().y - _box.getCenter().y);
-			point.z = (abs(_box.getMax().z - _box.getCenter().z) == 0) ? point.z : point.z / abs(_box.getMax().z - _box.getCenter().z);
-		}
-		*/
 	}
 
 	void Object::ResetMatrices() {
