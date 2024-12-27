@@ -8,10 +8,11 @@
 		_meshModel = MeshModel(wf);
 		//Create Bbox and calculate center
 		_box = BBox(wf);
-		TransferToWorldFrame(wf);
+		//Bring obj coordinates to World frame (recenter) + Normalize coordinates + add obj coordinates + homogenous coordinates to meshmodel
+		RecenterAndNormalize(wf);
 		//Isotropic scale by 10
-		Scale(10);
-		_modelMatrix = _translationMatrix * _rotationMatrix * _scaleMatrix;
+		//Scale(10);
+		//Transform();
 		std::cout << "Object Created" << std::endl;
 	}
 
@@ -21,8 +22,7 @@
 
 		//final calculation
 		_modelMatrix = _translationMatrix * _rotationMatrix * _scaleMatrix;
-		//Reset Matrix operations
-		ResetMatrices();
+		
 	}
 
 	void Object::Scale(float s) {
@@ -75,7 +75,22 @@
 	}
 
 	//Bring obj coordinates to World frame (recenter) + Normalize coordinates + add obj coordinates + homogenous coordinates to meshmodel
-	void Object::TransferToWorldFrame(Wavefront_obj& wf) {
+	void Object::RecenterAndNormalize(Wavefront_obj& wf) {
+		//recenter
+		glm::vec4 center = { _box._center.x,_box._center.y,_box._center.z,0};
+		for (auto& vertex : _meshModel._points) {
+			vertex -= center;
+		}
+		//normalize
+		glm::vec3 halfRange = (_box._max - _box._min) * 0.5f;
+		float maxHalfRange = std::max({ halfRange.x, halfRange.y, halfRange.z });
+		if (maxHalfRange > 0.0f) {
+			for (auto& vertex : _meshModel._points) {
+				vertex /= maxHalfRange;
+				vertex.w = 1.0f;
+			}
+		}
+		/*
 		for (glm::vec4& point : _meshModel._points)
 		{		
 			//recenter point
@@ -88,7 +103,7 @@
 			point.y = (abs(_box.getMax().y - _box.getCenter().y) == 0) ? point.y : point.y / abs(_box.getMax().y - _box.getCenter().y);
 			point.z = (abs(_box.getMax().z - _box.getCenter().z) == 0) ? point.z : point.z / abs(_box.getMax().z - _box.getCenter().z);
 		}
-
+		*/
 	}
 
 	void Object::ResetMatrices() {

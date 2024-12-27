@@ -5,14 +5,6 @@
 		//Extract Point
 		for (Wavefront_obj::Vector& point : wf.m_points)
 		{
-			/*
-			glm::vec4 newPoint;
-			newPoint.x = point.e[0];
-			newPoint.y = point.e[1];
-			newPoint.z = point.e[2];
-			newPoint.w = 1;
-			_points.push_back(newPoint);
-			*/
 			_points.emplace_back(point.e[0], point.e[1], point.e[2],1);
 		} 
 		//Extract Normals and Edges

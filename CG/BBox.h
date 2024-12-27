@@ -7,12 +7,12 @@
 class BBox
 {
 public:
-	glm::vec3 _max;
-	glm::vec3 _min;
+	glm::vec3 _max = { -INFINITY , -INFINITY, -INFINITY };
+	glm::vec3 _min = { INFINITY , INFINITY, INFINITY };
 	glm::vec3 _center;
 
-	std::vector<glm::vec4> _boxPoints;
-	std::set<pair<int, int>> _boxEdges;
+	std::vector<glm::vec4> _points;
+	std::set<pair<int, int>> _edges;
 
 	BBox();
 	BBox::BBox(Wavefront_obj& wf);

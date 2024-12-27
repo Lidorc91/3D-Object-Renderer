@@ -21,7 +21,7 @@ public:
 	glm::mat4 _scaleMatrix;
 
 	Object(Wavefront_obj& wf);
-	void TransferToWorldFrame(Wavefront_obj& wf);
+	void RecenterAndNormalize(Wavefront_obj& wf);
 	void Transform();
 	void ResetMatrices();
 private:

@@ -22,6 +22,7 @@
 LARGE_INTEGER StartingTime, EndingTime, ElapsedMicroseconds;
 LARGE_INTEGER Frequency;
 
+//TWEEK BAR VARIABLES
 double g_Scale = 1.0;
 //double g_quaternion[4] = {0.0, 0.0, 0.0, 1.0};
 double g_TranslateX = 0.0;
@@ -30,6 +31,13 @@ double g_TranslateZ = 0.0;
 double g_RotateX = 0.0;
 double g_RotateY = 0.0;
 double g_RotateZ = 0.0; 
+
+bool g_renderBox = true;
+
+//TWEEK BAR STATE CHANGE FUNCTION DECLARATIONS
+void SetRenderboxState();
+
+
 //Create scene
 Scene myScene = Scene();
 //Create renderer
@@ -142,6 +150,9 @@ int main(int argc, char* argv[])
 	TwAddVarRW(bar, "RotateX", TW_TYPE_DOUBLE, &g_RotateX, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around X-axis (0=original size).' ");
 	TwAddVarRW(bar, "RotateY", TW_TYPE_DOUBLE, &g_RotateY, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Y-axis (0=original size).' ");
 	TwAddVarRW(bar, "RotateZ", TW_TYPE_DOUBLE, &g_RotateZ, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Z-axis (0=original size).' ");
+
+	//add TW option for checkbox to render box by calling the function "toggleRenderBox"
+	TwAddVarRW(bar, "Render Box", TW_TYPE_BOOLCPP, &g_renderBox, " label='Render Box' key=b help='Toggle rendering of the bounding box.' ");
 
 	// Call the GLUT main loop
 	glutMainLoop();
@@ -405,6 +416,11 @@ void Display()
 
 	//time measuring - don't delete
 	QueryPerformanceCounter(&StartingTime);
+
+	//Changes States
+	SetRenderboxState();
+
+	//draw the scene
 	if (myScene._objects.size() > 0)
 		renderer.RenderScene(myScene);
 	else {
@@ -485,3 +501,7 @@ void Terminate(void)
 	TwTerminate();
 }
 
+//State Control Functions
+void SetRenderboxState() {
+	renderer._enablePrintBox = g_renderBox;
+}

@@ -18,7 +18,7 @@ void Renderer::RenderScene(Scene& scene) {
 	glm::mat4 SceneMatrix = scene.GenerateScene();
 	//Adjust to Viewport
 	for (Object& obj : scene.getObjects()) {
-		//Transform each point
+		//Transform Object Vertices
 		for (glm::vec4& point : obj._meshModel._points) {			
 			//Viewport Transform
 			point = _viewportMatrix * SceneMatrix * point;
@@ -26,7 +26,7 @@ void Renderer::RenderScene(Scene& scene) {
 			point = (point.w == 0) ? point : point/point.w;
 		}
 		//Transform BBox
-		for (glm::vec4& point : obj._box._boxPoints) {
+		for (glm::vec4& point : obj._box._points) {
 			//Viewport Transform			
 			point = _viewportMatrix * SceneMatrix * point;
 			//Perspective Divide
@@ -36,22 +36,13 @@ void Renderer::RenderScene(Scene& scene) {
 	//Render scene	
 	for (Object& obj : scene.getObjects()) {
 		RenderObject(obj);
-		if (printBox) {
+		if (_enablePrintBox) {
 			RenderBox(obj);
 		}
 	}
 	//Draw pixels
 	drawPixels(_pixels);
-	std::cout << "Object Rendered" << std::endl;
-	
-
-	/*
-	//Draw tweak bars
-	TwDraw();
-	//Swap back and front frame buffers
-	glutSwapBuffers();
-	*/
-
+	std::cout << "Object Rendered" << std::endl;	
 }
 void Renderer::RenderObject(const Object& obj) {
 	//Push Object points to pixels
@@ -64,18 +55,16 @@ void Renderer::RenderObject(const Object& obj) {
 		//Draw line between points
 		drawLine(x1,y1,x2,y2, _pixels);
 	}
-	
-	
 }
 
 void Renderer::RenderBox(const Object& obj) {
 	//Push BBox points to pixels
-	for (const pair<int, int> edge : obj._box._boxEdges) {
+	for (const pair<int, int> edge : obj._box._edges) {
 		//Create Integers for points
-		int x1 = static_cast<int>(std::round(obj._box._boxPoints[edge.first].x));
-		int y1 = static_cast<int>(std::round(obj._box._boxPoints[edge.first].y));
-		int x2 = static_cast<int>(std::round(obj._box._boxPoints[edge.second].x));
-		int y2 = static_cast<int>(std::round(obj._box._boxPoints[edge.second].y));
+		int x1 = static_cast<int>(std::round(obj._box._points[edge.first].x));
+		int y1 = static_cast<int>(std::round(obj._box._points[edge.first].y));
+		int x2 = static_cast<int>(std::round(obj._box._points[edge.second].x));
+		int y2 = static_cast<int>(std::round(obj._box._points[edge.second].y));
 
 		//Draw line between points
 		drawLine(x1, y1, x2, y2, _pixels);

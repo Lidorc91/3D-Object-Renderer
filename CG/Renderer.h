@@ -14,7 +14,7 @@ class Renderer
 {
 public:
 	glm::mat4 _viewportMatrix;
-	bool printBox = true;
+	bool _enablePrintBox = true;
 
 	Renderer();
 	~Renderer();

@@ -28,7 +28,7 @@ private:
 	float _far = 1000.0f;  // Far clipping plane
 	float _right = 1.0f;  // Right of the frustum
 	float _top = 1.0f;  // Top of the frustum
-	float _fov = 90.0f;  // Field of View
+	float _fov = 60.0f;  // Field of View
 
 	//glm::mat4 _projectionMatrix = glm::perspective(fov, aspect, near, far);
 	
