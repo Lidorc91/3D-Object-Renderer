@@ -33,13 +33,17 @@ double g_RotateY = 0.0;
 double g_RotateZ = 0.0; 
 
 bool g_renderBox = true;
+bool g_renderNormals = true;
 
 //TWEEK BAR STATE CHANGE FUNCTION DECLARATIONS
-void SetRenderboxState();
+void SetRenderBoxState();
+void SetRenderNormalsState();
 
 
 //Create scene
 Scene myScene = Scene();
+//Create object
+Object obj;
 //Create renderer
 Renderer renderer = Renderer();
 //points coordinates
@@ -89,7 +93,10 @@ void PassiveMouseMotion(int x, int y);
 void Keyboard(unsigned char k, int x, int y);
 void Special(int k, int x, int y);
 void Terminate(void);
+void TW_CALL _Scale(void* data);
 
+
+void TW_CALL SetRenderBoxCallback(void* data);
 
 int main(int argc, char* argv[])
 {
@@ -141,7 +148,7 @@ int main(int argc, char* argv[])
 		" label='Shape Selector' help='Select a shape to display.' ");
 
 	TwAddButton(bar, "open", loadOBJModel, NULL, " label='Open OBJ File...' ");
-
+	TwAddButton(bar, "Apply Scale", _Scale, NULL, " label='object scaling' ");
 	//add 'g_Scale' to 'bar': this is a modifiable (RW) variable of type TW_TYPE_DOUBLE. Its key shortcuts are [s] and [S].
 	TwAddVarRW(bar, "Scale", TW_TYPE_DOUBLE, &g_Scale, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Scale the object (1=original size).' ");
 	TwAddVarRW(bar, "TranslateX", TW_TYPE_DOUBLE, &g_TranslateX, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Translate the object in X-axis (0=original size).' ");
@@ -154,17 +161,39 @@ int main(int argc, char* argv[])
 	//add TW option for checkbox to render box by calling the function "toggleRenderBox"
 	TwAddVarRW(bar, "Render Box", TW_TYPE_BOOLCPP, &g_renderBox, " label='Render Box' key=b help='Toggle rendering of the bounding box.' ");
 
+	//add TW option for checkbox to render normals by calling the function "toggleNormals"
+	TwAddVarRW(bar, "Render Normals", TW_TYPE_BOOLCPP, &g_renderNormals, " label='Render Normals' key=n help='Toggle rendering of the normals.' ");
+
+	//Add TW button to apply box rendering
+	TwAddButton(bar, "Apply Box", SetRenderBoxCallback, NULL, " label='Apply Box' help='Apply the box rendering.' ");
+
 	// Call the GLUT main loop
 	glutMainLoop();
 
 	return 0;
 }
 
+void TW_CALL SetRenderBoxCallback(void* data) {
+	//Toggle the value of g_renderBox
+	g_renderBox = !g_renderBox;
+	if (myScene._hasObject) {
+		renderer.RenderScene(myScene);
+		glutPostRedisplay();
+	}
+}
+
 void callTransform() {
 
 }
+void TW_CALL _Scale(void* data) {
+	myScene._object->Scale(g_Scale);
+	renderer.RenderScene(myScene);
+}
+
 void TW_CALL loadOBJModel(void* data)
 {
+	myScene._hasObject = false;
+	myScene._object = nullptr;
 
 	std::wstring str = getOpenFileName();
 	
@@ -181,9 +210,11 @@ void TW_CALL loadOBJModel(void* data)
 	}
 
 	//create object
-	Object obj(objScene);
+	obj.ReadFile(objScene);
 	//Add object to scene
-	myScene.addObject(obj);
+	myScene.setObject(obj);
+
+	myScene._hasObject = true;
 
 	std::cout << "The number of vertices in the model is: " << objScene.m_points.size() << std::endl;
 	std::cout << "The number of triangles in the model is: " << objScene.m_faces.size() << std::endl;
@@ -413,15 +444,18 @@ void Display()
 	//time measuring - don't delete
 	QueryPerformanceCounter(&StartingTime);
 
+	
 	//Changes States
-	SetRenderboxState();
+	SetRenderBoxState();
+	SetRenderNormalsState();
 
 	//draw the scene
-	if (myScene._objects.size() > 0)
+	if (myScene._hasObject)
 		renderer.RenderScene(myScene);
 	else {
 		drawScene();
 	}
+	
 
 	//time measuring - don't delete
 	QueryPerformanceCounter(&EndingTime);
@@ -446,7 +480,7 @@ void Reshape(int width, int height)
 	///////add your reshape code here/////////////
 
 	//Update the aspect ratio for camera projection matrix
-	myScene._viewer->UpdateAspectRatio(width/height);
+	myScene._camera.UpdateAspectRatio(width/height);
 	//Update the viewport matrix
 	renderer.CalculateViewPortMatrix(width, height);
 
@@ -498,6 +532,10 @@ void Terminate(void)
 }
 
 //State Control Functions
-void SetRenderboxState() {
+void SetRenderBoxState() {
 	renderer._enablePrintBox = g_renderBox;
+}
+
+void SetRenderNormalsState() {
+	renderer._enablePrintNormals = g_renderNormals;
 }

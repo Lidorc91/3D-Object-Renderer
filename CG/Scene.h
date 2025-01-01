@@ -7,18 +7,17 @@
 class Scene
 {
 public:
-    std::vector<Object> _objects;
-    std::vector<Camera> _cameras;
-    static Camera* _viewer;
+    Object* _object = nullptr;
+    Camera _camera;
+	bool _hasObject = false;
 
     //void update(); // Update objects in the scene
     //void rasterize(std::vector<Pixel>& pixels); // Convert scene to pixel data
     Scene();
-    void addObject(Object& obj);
-    void addCamera(Camera& cam);
+    void setObject(Object& obj);
     glm::mat4 GenerateScene();
     //std::vector<glm::mat4> Transformations; ADD WHEN IMPLEMENTING MULTIPLE OBJECTS
-    std::vector<Object>& getObjects();
+    Object& getObject();
 
 private:
     //glm::mat4 _viewportMatrix;

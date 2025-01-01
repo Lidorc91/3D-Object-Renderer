@@ -18,9 +18,11 @@
 			//Extract normals for each face
 			//calculate normal
 			glm::vec3 normal = glm::normalize(glm::cross(glm::vec3(_points[face.v[1]] - _points[face.v[0]]), glm::vec3(_points[face.v[2]] - _points[face.v[0]])));
+			//convert to vec4
+			glm::vec4 normal4 = { normal.x,normal.y,normal.z,1 };
 			//associate normal with relevant face
 			std::array<int, 3> x = { face.v[0], face.v[1], face.v[2] };
-			_normals.push_back({ x,normal });			
+			_normals.push_back({ x,normal4 });
 		}
 	}
 

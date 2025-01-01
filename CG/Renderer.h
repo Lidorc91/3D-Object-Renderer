@@ -15,6 +15,7 @@ class Renderer
 public:
 	glm::mat4 _viewportMatrix;
 	bool _enablePrintBox = true;
+	bool _enablePrintNormals = true;
 
 	Renderer();
 	~Renderer();
@@ -22,7 +23,7 @@ public:
 	void RenderScene(Scene& scene);
 	void RenderObject(const Object& obj);
 	void RenderBox(const Object& obj);
-
+	void RenderNormals(const Object& obj);
 	void drawLine(int x1, int y1, int x2, int y2, std::vector<Pixel>& pixels);
 	void drawPixels(const std::vector<Pixel>& pixels);
 	

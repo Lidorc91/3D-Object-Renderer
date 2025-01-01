@@ -13,7 +13,7 @@ class MeshModel
 public:
 	//Vectors to store positions
 	std::vector<glm::vec4> _points;
-	std::vector<pair<std::array<int,3>, glm::vec3>> _normals;
+	std::vector<pair<std::array<int,3>, glm::vec4>> _normals;
 	std::set<pair<int,int>> _edges;
 	MeshModel();
 	MeshModel(Wavefront_obj& wf);

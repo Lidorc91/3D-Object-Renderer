@@ -8,38 +8,46 @@ Renderer::Renderer() : _viewportMatrix(1.0f), _pixels()
 	_pixels.reserve(1000000);
 }
 
-
 Renderer::~Renderer()
 {
 }
 
 void Renderer::RenderScene(Scene& scene) {
+	Object& obj = scene.getObject();
 	//Generate Scene Matrix - FOR 1 OBJECT ONLY !! UPDATE FOR MULTIPLE
 	glm::mat4 SceneMatrix = scene.GenerateScene();
 	//Adjust to Viewport
-	for (Object& obj : scene.getObjects()) {
 		//Transform Object Vertices
-		for (glm::vec4& point : obj._meshModel._points) {			
-			//Viewport Transform
-			point = _viewportMatrix * SceneMatrix * point;
-			//Perspective Divide
-			point = (point.w == 0) ? point : point/point.w;
-		}
+	for (glm::vec4& point : obj._meshModel._points) {			
+		//Viewport Transform
+		point = _viewportMatrix * SceneMatrix * point;
+		//Perspective Divide
+		point = (point.w == 0) ? point : point/point.w;
+	}
 		//Transform BBox
-		for (glm::vec4& point : obj._box._points) {
-			//Viewport Transform			
-			point = _viewportMatrix * SceneMatrix * point;
-			//Perspective Divide
-			point = (point.w == 0) ? point : point / point.w;
-		}
+	for (glm::vec4& point : obj._box._points) {
+		//Viewport Transform			
+		point = _viewportMatrix * SceneMatrix * point;
+		//Perspective Divide
+		point = (point.w == 0) ? point : point / point.w;
 	}
+		//Transform Normals
+	for (pair<std::array<int, 3>, glm::vec4>& point : obj._meshModel._normals) {
+		//Viewport Transform
+		point.second = _viewportMatrix * SceneMatrix * point.second;
+		//Perspective Divide
+		point.second = (point.second.w == 0) ? point.second : point.second / point.second.w;
+	}
+	
 	//Render scene	
-	for (Object& obj : scene.getObjects()) {
-		RenderObject(obj);
-		if (_enablePrintBox) {
-			RenderBox(obj);
-		}
+	RenderObject(obj);
+	if (_enablePrintBox) {
+		RenderBox(obj);
 	}
+	if (_enablePrintNormals) {
+		RenderNormals(obj);
+	}
+
 	//Draw pixels
 	drawPixels(_pixels);
 	std::cout << "Object Rendered" << std::endl;	
@@ -68,6 +76,25 @@ void Renderer::RenderBox(const Object& obj) {
 
 		//Draw line between points
 		drawLine(x1, y1, x2, y2, _pixels);
+	}
+}
+
+void Renderer::RenderNormals(const Object& obj) {
+	//Caculate centroid
+	glm::vec4 centroid = glm::vec4(0, 0, 0,0);
+	for (const pair<std::array<int, 3>, glm::vec4>& point : obj._meshModel._normals) {
+		//Calculate Centroid
+		centroid += obj._meshModel._points[point.first[0]];
+		centroid += obj._meshModel._points[point.first[1]];
+		centroid += obj._meshModel._points[point.first[2]];
+		centroid /= 3.0f;
+		//Calculate Normal Endpoint
+		float scale = 0.01f;
+		glm::vec4 normalEndpoint = centroid + (scale * point.second);
+
+		//Draw line between points
+		drawLine(static_cast<int>(std::round(centroid.x)), static_cast<int>(std::round(centroid.y)), static_cast<int>(std::round(normalEndpoint.x)), static_cast<int>(std::round(normalEndpoint.y)), _pixels);
+
 	}
 }
 

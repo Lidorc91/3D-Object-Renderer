@@ -1,9 +1,12 @@
 #include "Object.h"
 #include <iostream>
 
-
+	
 	//Object creation
-	Object::Object(Wavefront_obj& wf) : _modelMatrix(1.0f), _translationMatrix(1.0f), _rotationMatrix(1.0f), _scaleMatrix(1.0f) {
+	Object::Object() : _modelMatrix(1.0f), _translationMatrix(1.0f), _rotationMatrix(1.0f), _scaleMatrix(1.0f) {
+	}
+
+	void Object::ReadFile(Wavefront_obj& wf){
 		//Intialize meshmodel
 		_meshModel = MeshModel(wf);
 		//Create Bbox and calculate center
@@ -12,7 +15,6 @@
 		RecenterAndNormalize(wf);
 		//Isotropic scale by 10
 		Scale(5);
-		Transform();
 		std::cout << "Object Created" << std::endl;
 	}
 
@@ -21,8 +23,7 @@
 		//Trigger relevant transform function
 
 		//final calculation
-		_modelMatrix = _translationMatrix * _rotationMatrix * _scaleMatrix;
-		
+		_modelMatrix = _translationMatrix * _rotationMatrix * _scaleMatrix;		
 	}
 
 	void Object::Scale(float s) {
