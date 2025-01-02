@@ -15,7 +15,9 @@ public:
 	std::set<pair<int, int>> _edges;
 
 	BBox();
-	BBox::BBox(Wavefront_obj& wf);
+	void CreateBBox(Wavefront_obj& wf);
+	void Reset();
+
 	void UpdateCenter(MeshModel& model);	
 	inline void UpdateMax(const Wavefront_obj::Vector& point);
 	inline void UpdateMin(const Wavefront_obj::Vector& point);

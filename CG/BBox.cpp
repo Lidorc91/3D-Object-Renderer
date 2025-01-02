@@ -1,7 +1,9 @@
 #include "BBox.h"
 
 	BBox::BBox() : _points(), _edges(), _max{ 0, 0, 0 }, _min{ 0, 0, 0 }, _center{ 0, 0, 0 } {}
-	BBox::BBox(Wavefront_obj& wf) : _max{ 0, 0, 0 }, _min{ 0, 0, 0 }, _center{ 0, 0, 0 } {
+	void BBox::CreateBBox(Wavefront_obj& wf) {
+		//Reset BBox
+		Reset();
 		//Caclulate Min and Max for BBox
 		for (auto& point : wf.m_points) {
 			UpdateMax(point);
@@ -69,5 +71,14 @@
 	//Updating center only for wavefront obj
 	void BBox::UpdateCenter() {
 		_center = (_max + _min) * 0.5f;
+	}
+
+	//Reset BBox
+	void BBox::Reset() {
+		_points.clear();
+		_edges.clear();
+		_max = { 0, 0, 0 };
+		_min = { 0, 0, 0 };
+		_center = { 0, 0, 0 };
 	}
 

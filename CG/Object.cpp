@@ -4,13 +4,15 @@
 	
 	//Object creation
 	Object::Object() : _modelMatrix(1.0f), _translationMatrix(1.0f), _rotationMatrix(1.0f), _scaleMatrix(1.0f) {
+		_meshModel = MeshModel();
+		_box = BBox();
 	}
 
 	void Object::ReadFile(Wavefront_obj& wf){
 		//Intialize meshmodel
-		_meshModel = MeshModel(wf);
+		_meshModel.CreateMeshModel(wf);
 		//Create Bbox and calculate center
-		_box = BBox(wf);
+		_box.CreateBBox(wf);
 		//Bring obj coordinates to World frame (recenter) + Normalize coordinates + add obj coordinates + homogenous coordinates to meshmodel
 		RecenterAndNormalize(wf);
 		//Isotropic scale by 10

@@ -13,8 +13,18 @@ Renderer::~Renderer()
 }
 
 void Renderer::RenderScene(Scene& scene) {
+	//Check if object has been rendered
+	if (_objectRendered) {
+		drawPixels(_pixels);
+		std::cout << "Object Rerendered" << std::endl;
+		return;
+	}
+	//Clear Pixels
+	_pixels.clear();
+	std::cout << "Pixels Cleared" << std::endl;
+	//Get Object
 	Object& obj = scene.getObject();
-	//Generate Scene Matrix - FOR 1 OBJECT ONLY !! UPDATE FOR MULTIPLE
+	//Generate Scene Matrix
 	glm::mat4 SceneMatrix = scene.GenerateScene();
 	//Adjust to Viewport
 		//Transform Object Vertices
@@ -50,8 +60,10 @@ void Renderer::RenderScene(Scene& scene) {
 
 	//Draw pixels
 	drawPixels(_pixels);
-	std::cout << "Object Rendered" << std::endl;	
+	std::cout << "Object Rendered" << std::endl;
+	_objectRendered = true;
 }
+
 void Renderer::RenderObject(const Object& obj) {
 	//Push Object points to pixels
 	for(const pair<int, int> edge : obj._meshModel._edges) {
@@ -94,7 +106,6 @@ void Renderer::RenderNormals(const Object& obj) {
 
 		//Draw line between points
 		drawLine(static_cast<int>(std::round(centroid.x)), static_cast<int>(std::round(centroid.y)), static_cast<int>(std::round(normalEndpoint.x)), static_cast<int>(std::round(normalEndpoint.y)), _pixels);
-
 	}
 }
 

@@ -16,7 +16,8 @@ public:
 	std::vector<pair<std::array<int,3>, glm::vec4>> _normals;
 	std::set<pair<int,int>> _edges;
 	MeshModel();
-	MeshModel(Wavefront_obj& wf);
+	void CreateMeshModel(Wavefront_obj& wf);
+	void Reset();
 	
 };
 

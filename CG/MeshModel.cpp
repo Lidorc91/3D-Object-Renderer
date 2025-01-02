@@ -1,7 +1,9 @@
 #include "MeshModel.h"
 
 	MeshModel::MeshModel() {}
-	MeshModel::MeshModel(Wavefront_obj& wf) {
+	void MeshModel::CreateMeshModel(Wavefront_obj& wf) {
+		//Reset the mesh model
+		Reset();
 		//Extract Point
 		for (Wavefront_obj::Vector& point : wf.m_points)
 		{
@@ -24,6 +26,13 @@
 			std::array<int, 3> x = { face.v[0], face.v[1], face.v[2] };
 			_normals.push_back({ x,normal4 });
 		}
+	}
+
+	//Reset the mesh model
+	void MeshModel::Reset() {
+		_points.clear();
+		_normals.clear();
+		_edges.clear();
 	}
 
 

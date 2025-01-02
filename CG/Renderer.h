@@ -16,6 +16,7 @@ public:
 	glm::mat4 _viewportMatrix;
 	bool _enablePrintBox = true;
 	bool _enablePrintNormals = true;
+	bool _objectRendered = false; // Check if object has been rendered
 
 	Renderer();
 	~Renderer();

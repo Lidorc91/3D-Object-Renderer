@@ -42,8 +42,6 @@ void SetRenderNormalsState();
 
 //Create scene
 Scene myScene = Scene();
-//Create object
-Object obj;
 //Create renderer
 Renderer renderer = Renderer();
 //points coordinates
@@ -186,14 +184,15 @@ void callTransform() {
 
 }
 void TW_CALL _Scale(void* data) {
-	myScene._object->Scale(g_Scale);
+	myScene._object.Scale(g_Scale);
 	renderer.RenderScene(myScene);
 }
 
 void TW_CALL loadOBJModel(void* data)
 {
+	//Reset object
 	myScene._hasObject = false;
-	myScene._object = nullptr;
+	renderer._objectRendered = true;
 
 	std::wstring str = getOpenFileName();
 	
@@ -209,13 +208,12 @@ void TW_CALL loadOBJModel(void* data)
 		return;
 	}
 
-	//create object
-	obj.ReadFile(objScene);
 	//Add object to scene
-	myScene.setObject(obj);
-
+	myScene.setObject(objScene);
+	//Enable object rendering
+	renderer._objectRendered = false;
 	myScene._hasObject = true;
-
+	
 	std::cout << "The number of vertices in the model is: " << objScene.m_points.size() << std::endl;
 	std::cout << "The number of triangles in the model is: " << objScene.m_faces.size() << std::endl;
 }
@@ -451,7 +449,10 @@ void Display()
 
 	//draw the scene
 	if (myScene._hasObject)
+	{
 		renderer.RenderScene(myScene);
+		//if (!renderer._objectRendered)			
+	}		
 	else {
 		drawScene();
 	}
