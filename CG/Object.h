@@ -20,6 +20,15 @@ public:
 	glm::mat4 _rotationMatrix;
 	glm::mat4 _scaleMatrix;
 
+	//config variables
+	float _scale = 1.0f;
+	float _translateX = 0.0f;
+	float _translateY = 0.0f;
+	float _translateZ = 0.0f;
+	float _rotateX = 0.0f;
+	float _rotateY = 0.0f;
+	float _rotateZ = 0.0f;
+
 	Object();
 	void ReadFile(Wavefront_obj& wf);
 	void RecenterAndNormalize(Wavefront_obj& wf);

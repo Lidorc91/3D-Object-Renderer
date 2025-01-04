@@ -41,6 +41,7 @@ void Renderer::RenderScene(Scene& scene) {
 		//Perspective Divide
 		point = (point.w == 0) ? point : point / point.w;
 	}
+	/*
 		//Transform Normals
 	for (pair<std::array<int, 3>, glm::vec4>& point : obj._meshModel._normals) {
 		//Viewport Transform
@@ -48,6 +49,7 @@ void Renderer::RenderScene(Scene& scene) {
 		//Perspective Divide
 		point.second = (point.second.w == 0) ? point.second : point.second / point.second.w;
 	}
+	*/
 	
 	//Render scene	
 	RenderObject(obj);
@@ -101,7 +103,7 @@ void Renderer::RenderNormals(const Object& obj) {
 		centroid += obj._meshModel._points[point.first[2]];
 		centroid /= 3.0f;
 		//Calculate Normal Endpoint
-		float scale = 0.01f;
+		float scale = 1.1f;
 		glm::vec4 normalEndpoint = centroid + (scale * point.second);
 
 		//Draw line between points

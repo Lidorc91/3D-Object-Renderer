@@ -41,7 +41,6 @@ void Camera::UpdateViewer() {
 }
 
 void Camera::UpdatePerspective(float near, float far, float right, float top){
-
 	_near = near;
 	_far = far;
 	_right = right;

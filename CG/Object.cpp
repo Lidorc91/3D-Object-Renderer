@@ -33,12 +33,13 @@
 			0, s, 0, 0,
 			0, 0, s, 0,
 			0, 0, 0, 1);
-
+		Transform();
 		//Update BBox
 	}
 	void Object::Translate(float x, float y, float z) {
 		_translationMatrix[3] = glm::vec4(x, y, z, 1.0f);
 
+		Transform();
 		//Update BBox
 	}
 
@@ -47,6 +48,7 @@
 		glm::mat4 rotateY(float y);
 		glm::mat4 rotateZ(float z);
 
+		Transform();
 		//Update BBox
 	}
 

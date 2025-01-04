@@ -23,8 +23,10 @@ LARGE_INTEGER StartingTime, EndingTime, ElapsedMicroseconds;
 LARGE_INTEGER Frequency;
 
 //TWEEK BAR VARIABLES
-double g_Scale = 1.0;
 //double g_quaternion[4] = {0.0, 0.0, 0.0, 1.0};
+
+	//Transformations
+double g_Scale = 1.0;
 double g_TranslateX = 0.0;
 double g_TranslateY = 0.0;
 double g_TranslateZ = 0.0;
@@ -35,10 +37,22 @@ double g_RotateZ = 0.0;
 bool g_renderBox = true;
 bool g_renderNormals = true;
 
-//TWEEK BAR STATE CHANGE FUNCTION DECLARATIONS
-void SetRenderBoxState();
-void SetRenderNormalsState();
-
+//TWEEK BAR FUNCTION DECLARATIONS
+	// Object Transformations
+void TW_CALL Scale(void* data);
+void TW_CALL Translate(void* data);
+void TW_CALL Rotate(void* data);
+	//World Transformations
+void TW_CALL ScaleWorld(void* data);
+void TW_CALL RotateWorld(void* data);
+	//Camera Update
+void TW_CALL ViewMatrixUpdate(void* data);
+	//Projection Update
+void TW_CALL ProjectionMatrixUpdateFOV(void* data);
+void TW_CALL ProjectionMatrixUpdateRightTop(void* data);
+	//Render Options
+void TW_CALL SetRenderBoxState(void* data);
+void TW_CALL SetRenderNormalsState(void* data);
 
 //Create scene
 Scene myScene = Scene();
@@ -91,10 +105,7 @@ void PassiveMouseMotion(int x, int y);
 void Keyboard(unsigned char k, int x, int y);
 void Special(int k, int x, int y);
 void Terminate(void);
-void TW_CALL _Scale(void* data);
 
-
-void TW_CALL SetRenderBoxCallback(void* data);
 
 int main(int argc, char* argv[])
 {
@@ -127,43 +138,87 @@ int main(int argc, char* argv[])
 
 	TwDefine(" GLOBAL help='This example shows how to integrate AntTweakBar with GLUT and OpenGL.' "); // Message added to the help bar.
 	TwDefine(" TweakBar size='200 400' color='96 216 224' "); // change default tweak bar size and color
-	//the x,y coordinates
-	TwAddVarRW(bar, "P1.x", TW_TYPE_INT32, &g_P1x, " min=-1500 max=1500 step=1 keyIncr=x keyDecr=X help='Point 1 x coordinate' ");
-	TwAddVarRW(bar, "P1.y", TW_TYPE_INT32, &g_P1y, " min=-1500 max=750 step=1 keyIncr=y keyDecr=Y help='Point 1 y coordinate' ");
-	TwAddVarRW(bar, "P2.x", TW_TYPE_INT32, &g_P2x, " min=-1500 max=1500 step=1 keyIncr=a keyDecr=A help='Point 2 x coordinate' ");
-	TwAddVarRW(bar, "P2.y", TW_TYPE_INT32, &g_P2y, " min=-1500 max=750 step=1 keyIncr=b keyDecr=B help='Point 2 y coordinate' ");
-	TwAddVarRO(bar, "time (us)", TW_TYPE_UINT32, &ElapsedMicroseconds.LowPart, "help='shows the drawing time in micro seconds'");
 
-	TwAddVarRW(bar, "LineColor", TW_TYPE_COLOR32, &g_LineColor, " label='Line Color' help='Change the color of the line.' ");
+	//Shape Drawing group
+		//the x,y coordinates
+	TwAddVarRW(bar, "P1.x", TW_TYPE_INT32, &g_P1x, " min=-1500 max=1500 step=1 keyIncr=x keyDecr=X help='Point 1 x coordinate' group='Shape Drawing' ");
+	TwAddVarRW(bar, "P1.y", TW_TYPE_INT32, &g_P1y, " min=-1500 max=750 step=1 keyIncr=y keyDecr=Y help='Point 1 y coordinate' group='Shape Drawing' ");
+	TwAddVarRW(bar, "P2.x", TW_TYPE_INT32, &g_P2x, " min=-1500 max=1500 step=1 keyIncr=a keyDecr=A help='Point 2 x coordinate' group='Shape Drawing' ");
+	TwAddVarRW(bar, "P2.y", TW_TYPE_INT32, &g_P2y, " min=-1500 max=750 step=1 keyIncr=b keyDecr=B help='Point 2 y coordinate' group='Shape Drawing' ");
+		//line color
+	TwAddVarRW(bar, "LineColor", TW_TYPE_COLOR32, &g_LineColor, " label='Line Color' help='Change the color of the line.' group='Shape Drawing'");
+		//shape selector
+	TwAddVarRW(bar, "Shape Selector", shapeType, &g_ShapeSelector, " label='Shape Selector' help='Select a shape to display.' group='Shape Drawing'");
+		//time to draw the shape
+	TwAddVarRO(bar, "time (us)", TW_TYPE_UINT32, &ElapsedMicroseconds.LowPart, "help='shows the drawing time in micro seconds' group='Shape Drawing'");
+	
+	//Load OBJ file
+	TwAddButton(bar, "open", loadOBJModel, NULL, " label='Open OBJ File...' ");
 
-	//add 'g_Scale' to 'bar': this is a modifiable (RW) variable of type TW_TYPE_DOUBLE. Its key shortcuts are [s] and [S].
-	TwAddVarRW(bar, "Scale", TW_TYPE_DOUBLE, &g_Scale, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Scale the object (1=original size).' ");
+	//Transformations group
+	TwAddVarRW(bar, "Scale", TW_TYPE_DOUBLE, &g_Scale, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Scale the object (1=original size).' group = 'Transformations' ");
+	TwAddButton(bar, "Apply Object Scale", Scale, NULL, " label='Scale Object' group = 'Transformations'");
+	TwAddButton(bar, "Apply Global Scale", ScaleWorld, NULL, " label='Scale World' group = 'Transformations'");
+
+	TwAddVarRW(bar, "TranslateX", TW_TYPE_DOUBLE, &g_TranslateX, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Translate the object in X-axis (0=original size).' group = 'Transformations'");
+	TwAddVarRW(bar, "TranslateY", TW_TYPE_DOUBLE, &g_TranslateY, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Y-axis (0=original size).' group = 'Transformations'");
+	TwAddVarRW(bar, "TranslateZ", TW_TYPE_DOUBLE, &g_TranslateZ, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Z-axis (0=original size).' group = 'Transformations'");
+	TwAddButton(bar, "Apply Object Translate", Translate, NULL, " label='Translate' group = 'Transformations'");
+
+	TwAddVarRW(bar, "RotateX", TW_TYPE_DOUBLE, &g_RotateX, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around X-axis (0=original size).' group = 'Transformations'");
+	TwAddVarRW(bar, "RotateY", TW_TYPE_DOUBLE, &g_RotateY, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Y-axis (0=original size).' group = 'Transformations'");
+	TwAddVarRW(bar, "RotateZ", TW_TYPE_DOUBLE, &g_RotateZ, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Z-axis (0=original size).' group = 'Transformations'");
+	TwAddButton(bar, "Apply Object Rotation", Rotate, NULL, " label='Rotate Object' group = 'Transformations'");
+	TwAddButton(bar, "Apply Global Rotation", RotateWorld, NULL, " label='Rotate World' group = 'Transformations'");
+
+	//World Transformations group
+		//TODO
+
+	//Camera group
+		//camera position variable
+	TwAddVarRW(bar, "Camera X pos.", TW_TYPE_FLOAT, &myScene._camera._eye.x, " label='x pos. (cam.)' help='Change the camera position.' group = 'Camera'");
+	TwAddVarRW(bar, "Camera Y pos.", TW_TYPE_FLOAT, &myScene._camera._eye.y, " label='y pos. (cam.)' help='Change the camera position.' group = 'Camera'");
+	TwAddVarRW(bar, "Camera Z pos.", TW_TYPE_FLOAT, &myScene._camera._eye.z, " label='z pos. (cam.)' help='Change the camera position.' group = 'Camera'");
+		//camera target variable
+	TwAddVarRW(bar, "Camera Target X", TW_TYPE_FLOAT, &myScene._camera._target.x, " label='x pos. (tar.)' help='Change the camera target.' group = 'Camera'");
+	TwAddVarRW(bar, "Camera Target Y", TW_TYPE_FLOAT, &myScene._camera._target.y, " label='y pos. (tar.)' help='Change the camera target.' group = 'Camera'");
+	TwAddVarRW(bar, "Camera Target Z", TW_TYPE_FLOAT, &myScene._camera._target.z, " label='z pos. (tar.)' help='Change the camera target.' group = 'Camera'");
+		//camera up variable
+	TwAddVarRW(bar, "Camera Up X", TW_TYPE_FLOAT, &myScene._camera._up.x, " label='x pos. (up)' help='Change the camera up.' group = 'Camera'");
+	TwAddVarRW(bar, "Camera Up Y", TW_TYPE_FLOAT, &myScene._camera._up.y, " label='y pos. (up)' help='Change the camera up.' group = 'Camera'");
+	TwAddVarRW(bar, "Camera Up Z", TW_TYPE_FLOAT, &myScene._camera._up.z, " label='z pos. (up)' help='Change the camera up.' group = 'Camera'");
+		//camera configuration - view matrix
+	TwAddButton(bar, "Update Camera", ViewMatrixUpdate , NULL, " label='Update Camera' help='Update the camera view matrix.' group = 'Camera'");
+
+	//Projection group
+		//projection variables
+	TwAddVarRW(bar, "Camera Near", TW_TYPE_FLOAT, &myScene._camera._near, " min=0.1 max=1000 step=0.1 keyIncr=n keyDecr=N help='Change the near clipping plane.' group = 'Projection'");
+	TwAddVarRW(bar, "Camera Far", TW_TYPE_FLOAT, &myScene._camera._far, " min=0.1 max=1000 step=0.1 keyIncr=f keyDecr=F help='Change the far clipping plane.' group = 'Projection'");
+	TwAddVarRW(bar, "Camera Right", TW_TYPE_FLOAT, &myScene._camera._right, " min=0.1 max=1000 step=0.1 keyIncr=r keyDecr=R help='Change the right of the frustum.' group = 'Projection'");
+	TwAddVarRW(bar, "Camera Top", TW_TYPE_FLOAT, &myScene._camera._top, " min=0.1 max=1000 step=0.1 keyIncr=t keyDecr=T help='Change the top of the frustum.' group = 'Projection'");
+	TwAddVarRW(bar, "Camera FOV", TW_TYPE_FLOAT, &myScene._camera._fov, " min=0.1 max=1000 step=0.1 keyIncr=v keyDecr=V help='Change the field of view.' group = 'Projection'");
+		//projection update
+			//based on right and top
+	TwAddButton(bar, "Update Camera (right-top)", ProjectionMatrixUpdateRightTop, NULL, " label='Update Right-Top' help='Update the camera perspective.' group = 'Projection'");
+			//based on FOV
+	TwAddButton(bar, "Update Camera (FOV)", ProjectionMatrixUpdateFOV, NULL, " label='Update FOV' help='Update the camera perspective.' group = 'Projection'");
 
 	//add 'g_quaternion' to 'bar': this is a variable of type TW_TYPE_QUAT4D which defines the object's orientation using quaternions
 	//TwAddVarRW(bar, "ObjRotation", TW_TYPE_QUAT4D, &g_quaternion, " label='Object rotation' opened=true help='Change the object orientation.' ");
 
-	TwAddVarRW(bar, "Shape Selector", shapeType, &g_ShapeSelector,
-		" label='Shape Selector' help='Select a shape to display.' ");
+	//Render Options (Render group)
+	TwAddVarRW(bar, "Render Box", TW_TYPE_BOOLCPP, &g_renderBox, " label='Render Box' key=b help='Toggle rendering of the bounding box.' group = 'Render Options'");
+	TwAddButton(bar, "Apply Box", SetRenderBoxState, NULL, " label='Apply Box' help='Apply the box rendering.' group = 'Render Options'");
 
-	TwAddButton(bar, "open", loadOBJModel, NULL, " label='Open OBJ File...' ");
-	TwAddButton(bar, "Apply Scale", _Scale, NULL, " label='object scaling' ");
-	//add 'g_Scale' to 'bar': this is a modifiable (RW) variable of type TW_TYPE_DOUBLE. Its key shortcuts are [s] and [S].
-	TwAddVarRW(bar, "Scale", TW_TYPE_DOUBLE, &g_Scale, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Scale the object (1=original size).' ");
-	TwAddVarRW(bar, "TranslateX", TW_TYPE_DOUBLE, &g_TranslateX, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Translate the object in X-axis (0=original size).' ");
-	TwAddVarRW(bar, "TranslateY", TW_TYPE_DOUBLE, &g_TranslateY, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Y-axis (0=original size).' ");
-	TwAddVarRW(bar, "TranslateZ", TW_TYPE_DOUBLE, &g_TranslateZ, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Z-axis (0=original size).' ");
-	TwAddVarRW(bar, "RotateX", TW_TYPE_DOUBLE, &g_RotateX, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around X-axis (0=original size).' ");
-	TwAddVarRW(bar, "RotateY", TW_TYPE_DOUBLE, &g_RotateY, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Y-axis (0=original size).' ");
-	TwAddVarRW(bar, "RotateZ", TW_TYPE_DOUBLE, &g_RotateZ, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Z-axis (0=original size).' ");
+	TwAddVarRW(bar, "Render Normals", TW_TYPE_BOOLCPP, &g_renderNormals, " label='Render Normals' key=n help='Toggle rendering of the normals.' group = 'Render Options'");
+	TwAddButton(bar, "Apply Normals", SetRenderNormalsState, NULL, " label='Apply Normals' help='Apply the normals rendering.' group = 'Render Options'");
 
-	//add TW option for checkbox to render box by calling the function "toggleRenderBox"
-	TwAddVarRW(bar, "Render Box", TW_TYPE_BOOLCPP, &g_renderBox, " label='Render Box' key=b help='Toggle rendering of the bounding box.' ");
-
-	//add TW option for checkbox to render normals by calling the function "toggleNormals"
-	TwAddVarRW(bar, "Render Normals", TW_TYPE_BOOLCPP, &g_renderNormals, " label='Render Normals' key=n help='Toggle rendering of the normals.' ");
-
-	//Add TW button to apply box rendering
-	TwAddButton(bar, "Apply Box", SetRenderBoxCallback, NULL, " label='Apply Box' help='Apply the box rendering.' ");
+	//Default group view settings
+	TwDefine(" TweakBar/'Shape Drawing' opened=true ");
+	TwDefine(" TweakBar/'Transformations' opened=false ");
+	TwDefine(" TweakBar/Camera opened=false ");
+	TwDefine(" TweakBar/Projection opened=false ");
+	TwDefine(" TweakBar/'Render Options' opened=false ");
 
 	// Call the GLUT main loop
 	glutMainLoop();
@@ -171,23 +226,7 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-void TW_CALL SetRenderBoxCallback(void* data) {
-	//Toggle the value of g_renderBox
-	g_renderBox = !g_renderBox;
-	if (myScene._hasObject) {
-		renderer.RenderScene(myScene);
-		glutPostRedisplay();
-	}
-}
-
-void callTransform() {
-
-}
-void TW_CALL _Scale(void* data) {
-	myScene._object.Scale(g_Scale);
-	renderer.RenderScene(myScene);
-}
-
+//Callback Functions
 void TW_CALL loadOBJModel(void* data)
 {
 	//Reset object
@@ -218,6 +257,42 @@ void TW_CALL loadOBJModel(void* data)
 	std::cout << "The number of triangles in the model is: " << objScene.m_faces.size() << std::endl;
 }
 
+void TW_CALL Scale(void* data) {
+	myScene._object.Scale(g_Scale);
+}
+void TW_CALL Translate(void* data) {
+	myScene._object.Translate(g_TranslateX, g_TranslateY, g_TranslateZ);
+}
+void TW_CALL Rotate(void* data) {
+	myScene._object.Rotate(g_RotateX,g_RotateY,g_RotateZ);
+}
+
+void TW_CALL ScaleWorld(void* data) {
+	//TODO
+}
+void TW_CALL RotateWorld(void* data) {
+	//TODO
+}
+
+void TW_CALL ViewMatrixUpdate(void* data) {
+	myScene._camera.UpdateViewer();
+}
+
+void TW_CALL ProjectionMatrixUpdateFOV(void* data) {
+	myScene._camera.UpdatePerspective(myScene._camera._near, myScene._camera._far, myScene._camera._fov);
+}
+
+void TW_CALL ProjectionMatrixUpdateRightTop(void* data) {
+	myScene._camera.UpdatePerspective(myScene._camera._near, myScene._camera._far, myScene._camera._right, myScene._camera._top);
+}
+
+void TW_CALL SetRenderBoxState(void* data) {
+	renderer._enablePrintBox = g_renderBox;
+}
+
+void TW_CALL SetRenderNormalsState(void* data) {
+	renderer._enablePrintNormals = g_renderNormals;
+}
 
 //do not change this function unless you really know what you are doing!
 void initGraphics(int argc, char* argv[])
@@ -415,6 +490,13 @@ void drawScene()
 	renderer.drawPixels(pixels);
 }
 
+/*
+void drawObject() { //IDEA - call to renderer like from drawScene and allow for multiple calls
+	std::vector<Pixel> pixels;
+	pixels.reserve(100000);
+
+}
+*/
 
 //this will make sure that integer coordinates are mapped exactly to corresponding pixels on screen
 void glUseScreenCoordinates(int width, int height)
@@ -442,16 +524,11 @@ void Display()
 	//time measuring - don't delete
 	QueryPerformanceCounter(&StartingTime);
 
-	
-	//Changes States
-	SetRenderBoxState();
-	SetRenderNormalsState();
-
 	//draw the scene
 	if (myScene._hasObject)
 	{
+		//drawObject();
 		renderer.RenderScene(myScene);
-		//if (!renderer._objectRendered)			
 	}		
 	else {
 		drawScene();
@@ -492,8 +569,6 @@ void Reshape(int width, int height)
 	glutPostRedisplay();
 }
 
-
-
 void MouseButton(int button, int state, int x, int y)
 {
 	TwEventMouseButtonGLUT(button, state, x, y);
@@ -525,18 +600,8 @@ void Special(int k, int x, int y)
 	glutPostRedisplay();
 }
 
-
 // Function called at exit
 void Terminate(void)
 {
 	TwTerminate();
-}
-
-//State Control Functions
-void SetRenderBoxState() {
-	renderer._enablePrintBox = g_renderBox;
-}
-
-void SetRenderNormalsState() {
-	renderer._enablePrintNormals = g_renderNormals;
 }
