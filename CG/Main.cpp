@@ -369,6 +369,8 @@ void drawScene()
 	std::vector<Pixel> pixels;
 	pixels.reserve(100000); //consider changing this if more pixels are colored in the next assignments
 
+	//TODO - Try adding rendering of the object here
+
 	//Variable Declaration
 	int y, p;
 	Pixel pixel;
