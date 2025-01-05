@@ -25,6 +25,6 @@
 		return SceneMatrix;
 	}
 
-	Object& Scene::getObject() {
+	Object Scene::getObject() {
 		return _object;
 	}

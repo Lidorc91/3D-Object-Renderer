@@ -152,13 +152,13 @@ int main(int argc, char* argv[])
 	TwAddButton(bar, "open", loadOBJModel, NULL, " label='Open OBJ File...' ");
 
 	//Transformations group
-	TwAddVarRW(bar, "Scale", TW_TYPE_DOUBLE, &g_Scale, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Scale the object (1=original size).' group = 'Transformations' ");
+	TwAddVarRW(bar, "Scale", TW_TYPE_DOUBLE, &g_Scale, " min=0.01 max=20 step=0.01 keyIncr=s keyDecr=S help='Scale the object (1=original size).' group = 'Transformations' ");
 	TwAddButton(bar, "Apply Object Scale", Scale, NULL, " label='Scale Object' group = 'Transformations'");
 	TwAddButton(bar, "Apply Global Scale", ScaleWorld, NULL, " label='Scale World' group = 'Transformations'");
 
-	TwAddVarRW(bar, "TranslateX", TW_TYPE_DOUBLE, &g_TranslateX, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Translate the object in X-axis (0=original size).' group = 'Transformations'");
-	TwAddVarRW(bar, "TranslateY", TW_TYPE_DOUBLE, &g_TranslateY, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Y-axis (0=original size).' group = 'Transformations'");
-	TwAddVarRW(bar, "TranslateZ", TW_TYPE_DOUBLE, &g_TranslateZ, " min=0.01 max=2.5 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Z-axis (0=original size).' group = 'Transformations'");
+	TwAddVarRW(bar, "TranslateX", TW_TYPE_DOUBLE, &g_TranslateX, " min=0.01 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in X-axis (0=original size).' group = 'Transformations'");
+	TwAddVarRW(bar, "TranslateY", TW_TYPE_DOUBLE, &g_TranslateY, " min=0.01 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Y-axis (0=original size).' group = 'Transformations'");
+	TwAddVarRW(bar, "TranslateZ", TW_TYPE_DOUBLE, &g_TranslateZ, " min=0.01 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Z-axis (0=original size).' group = 'Transformations'");
 	TwAddButton(bar, "Apply Object Translate", Translate, NULL, " label='Translate' group = 'Transformations'");
 
 	TwAddVarRW(bar, "RotateX", TW_TYPE_DOUBLE, &g_RotateX, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around X-axis (0=original size).' group = 'Transformations'");

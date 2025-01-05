@@ -17,7 +17,7 @@ public:
     void setObject(Wavefront_obj& obj);
     glm::mat4 GenerateScene();
     //std::vector<glm::mat4> Transformations; ADD WHEN IMPLEMENTING MULTIPLE OBJECTS
-    Object& getObject();
+    Object getObject();
 
 private:
     //glm::mat4 _viewportMatrix;

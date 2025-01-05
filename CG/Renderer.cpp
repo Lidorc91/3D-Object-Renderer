@@ -23,7 +23,7 @@ void Renderer::RenderScene(Scene& scene) {
 	_pixels.clear();
 	std::cout << "Pixels Cleared" << std::endl;
 	//Get Object
-	Object& obj = scene.getObject();
+	Object obj = scene.getObject();
 	//Generate Scene Matrix
 	glm::mat4 SceneMatrix = scene.GenerateScene();
 	//Adjust to Viewport
