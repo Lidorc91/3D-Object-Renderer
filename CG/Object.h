@@ -38,8 +38,8 @@ public:
 	void Scale(float s);
 	void Translate(float x, float y, float z);
 	void Rotate(float x, float y, float z);
-	void rotateX(float angle);
-	void rotateY(float angle);
-	void rotateZ(float angle);
+	glm::mat4 rotateX(float angle);
+	glm::mat4 rotateY(float angle);
+	glm::mat4 rotateZ(float angle);
 };
 

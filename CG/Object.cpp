@@ -17,6 +17,10 @@
 		RecenterAndNormalize(wf);
 		//Isotropic scale by 10
 		Scale(5);
+		//Rotate 90 degrees around X-axis
+		//Rotate(90, 0, 45); // Change to combine rotations
+		//Translate by 1 in X-axis
+		//Translate(1, 0, 0);
 		std::cout << "Object Created" << std::endl;
 	}
 
@@ -33,50 +37,60 @@
 			0, s, 0, 0,
 			0, 0, s, 0,
 			0, 0, 0, 1);
-		Transform();
+		//Transform();
 		//Update BBox
 	}
 	void Object::Translate(float x, float y, float z) {
 		_translationMatrix[3] = glm::vec4(x, y, z, 1.0f);
 
-		Transform();
+		//Transform();
 		//Update BBox
 	}
 
 	void Object::Rotate(float x, float y, float z) { // TODO - Change to switch case (can only pick 1 axis at a time w/ amount of rotation)
-		glm::mat4 rotateX(float x);
-		glm::mat4 rotateY(float y);
-		glm::mat4 rotateZ(float z);
+		glm::mat4 Rx = x != 0 ? rotateX(x) : glm::mat4(1.0f);
+		glm::mat4 Ry = y != 0 ? rotateY(y) : glm::mat4(1.0f);
+		glm::mat4 Rz = z != 0 ? rotateZ(z) : glm::mat4(1.0f);
 
-		Transform();
+		_rotationMatrix = Rx * Ry * Rz;
+		//Transform();
 		//Update BBox
 	}
 
 	// Create rotation matrix around X-axis
-	void Object::rotateX(float angle) {
+	glm::mat4 Object::rotateX(float angle) {
 		double rad = angle * M_PI / 180.0;
-		_rotationMatrix[1][1] = cos(rad);
-		_rotationMatrix[1][2] = -sin(rad);
-		_rotationMatrix[2][1] = sin(rad);
-		_rotationMatrix[2][2] = cos(rad);		
+		glm::mat4 Rx = glm::mat4(1.0f);
+		Rx[1][1] = cos(rad);
+		Rx[1][2] = -sin(rad);
+		Rx[2][1] = sin(rad);
+		Rx[2][2] = cos(rad);	
+
+		return Rx;
 	}
 
 	// Create rotation matrix around Y-axis
-	void Object::rotateY(float angle) {
+	glm::mat4 Object::rotateY(float angle) {
 		double rad = angle * M_PI / 180.0;
-		_rotationMatrix[0][0] = cos(rad);
-		_rotationMatrix[0][2] = sin(rad);
-		_rotationMatrix[2][0] = -sin(rad);
-		_rotationMatrix[2][2] = cos(rad);
+		glm::mat4 Ry = glm::mat4(1.0f);
+		Ry[0][0] = cos(rad);
+		Ry[0][2] = sin(rad);
+		Ry[2][0] = -sin(rad);
+		Ry[2][2] = cos(rad);
+
+		return Ry;
 	}
 
 	// Create rotation matrix around Z-axis
-	void Object::rotateZ(float angle) {
+	glm::mat4 Object::rotateZ(float angle) {
 		double rad = angle * M_PI / 180.0;
-		_rotationMatrix[0][0] = cos(rad);
-		_rotationMatrix[0][1] = -sin(rad);
-		_rotationMatrix[1][0] = sin(rad);
-		_rotationMatrix[1][1] = cos(rad);
+		glm::mat4 Rz = glm::mat4(1.0f);
+		Rz[0][0] = cos(rad);
+		Rz[0][1] = -sin(rad);
+		Rz[1][0] = sin(rad);
+		Rz[1][1] = cos(rad);
+
+		return Rz;
 	}
 
 	//Bring obj coordinates to World frame (recenter) + Normalize coordinates + add obj coordinates + homogenous coordinates to meshmodel
