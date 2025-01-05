@@ -89,10 +89,6 @@ TwEnumVal shapeEnum[] = {
 };
 TwType shapeType;
 
-
-//obj data type
-Wavefront_obj objScene;
-
 void TW_CALL loadOBJModel(void* clientData);
 void initScene();
 void initGraphics(int argc, char* argv[]);
@@ -229,9 +225,8 @@ int main(int argc, char* argv[])
 //Callback Functions
 void TW_CALL loadOBJModel(void* data)
 {
-	//Reset object
-	myScene._hasObject = false;
-	renderer._objectRendered = true;
+	//Temporary object to store the obj file
+	Wavefront_obj objScene;
 
 	std::wstring str = getOpenFileName();
 	
@@ -240,18 +235,16 @@ void TW_CALL loadOBJModel(void* data)
 	if (result)
 	{
 		std::cout << "The obj file was loaded successfully" << std::endl;
+		//Add object to scene
+		myScene.setObject(objScene);
+		//Enable object rendering
+		renderer._objectChanged = true;
 	}
 	else
 	{
 		std::cerr << "Failed to load obj file" << std::endl;
 		return;
-	}
-
-	//Add object to scene
-	myScene.setObject(objScene);
-	//Enable object rendering
-	renderer._objectRendered = false;
-	myScene._hasObject = true;
+	}	
 	
 	std::cout << "The number of vertices in the model is: " << objScene.m_points.size() << std::endl;
 	std::cout << "The number of triangles in the model is: " << objScene.m_faces.size() << std::endl;
@@ -259,12 +252,15 @@ void TW_CALL loadOBJModel(void* data)
 
 void TW_CALL Scale(void* data) {
 	myScene._object.Scale(g_Scale);
+	renderer._objectChanged = true;
 }
 void TW_CALL Translate(void* data) {
 	myScene._object.Translate(g_TranslateX, g_TranslateY, g_TranslateZ);
+	renderer._objectChanged = true;
 }
 void TW_CALL Rotate(void* data) {
 	myScene._object.Rotate(g_RotateX,g_RotateY,g_RotateZ);
+	renderer._objectChanged = true;
 }
 
 void TW_CALL ScaleWorld(void* data) {
@@ -276,22 +272,27 @@ void TW_CALL RotateWorld(void* data) {
 
 void TW_CALL ViewMatrixUpdate(void* data) {
 	myScene._camera.UpdateViewer();
+	renderer._objectChanged = true;
 }
 
 void TW_CALL ProjectionMatrixUpdateFOV(void* data) {
 	myScene._camera.UpdatePerspective(myScene._camera._near, myScene._camera._far, myScene._camera._fov);
+	renderer._objectChanged = true;
 }
 
 void TW_CALL ProjectionMatrixUpdateRightTop(void* data) {
 	myScene._camera.UpdatePerspective(myScene._camera._near, myScene._camera._far, myScene._camera._right, myScene._camera._top);
+	renderer._objectChanged = true;
 }
 
 void TW_CALL SetRenderBoxState(void* data) {
 	renderer._enablePrintBox = g_renderBox;
+	renderer._objectChanged = true;
 }
 
 void TW_CALL SetRenderNormalsState(void* data) {
 	renderer._enablePrintNormals = g_renderNormals;
+	renderer._objectChanged = true;
 }
 
 //do not change this function unless you really know what you are doing!

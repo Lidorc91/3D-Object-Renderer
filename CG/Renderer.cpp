@@ -14,7 +14,7 @@ Renderer::~Renderer()
 
 void Renderer::RenderScene(Scene& scene) {
 	//Check if object has been rendered
-	if (_objectRendered) {
+	if (!_objectChanged) {
 		drawPixels(_pixels);
 		std::cout << "Object Rerendered" << std::endl;
 		return;
@@ -54,7 +54,7 @@ void Renderer::RenderScene(Scene& scene) {
 	//Draw pixels
 	drawPixels(_pixels);
 	std::cout << "Object Rendered" << std::endl;
-	_objectRendered = true;
+	_objectChanged = false;
 }
 
 void Renderer::RenderObject(const Object& obj) {
