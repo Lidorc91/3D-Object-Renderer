@@ -17,6 +17,10 @@
 		RecenterAndNormalize(wf);
 		//Isotropic scale by 10
 		Scale(5);
+		_axisPoints.clear();
+		_axisEdges.clear();
+		//Generate object axis
+		GenerateAxis();
 		//Rotate 90 degrees around X-axis
 		//Rotate(90, 0, 45); // Change to combine rotations
 		//Translate by 1 in X-axis
@@ -28,7 +32,7 @@
 	void Object::Transform() {
 		//Trigger relevant transform function
 
-		//final calculation
+		//final calculation in column major order T*R*S
 		_modelMatrix = _translationMatrix * _rotationMatrix * _scaleMatrix;		
 	}
 
@@ -96,21 +100,39 @@
 	//Bring obj coordinates to World frame (recenter) + Normalize coordinates + add obj coordinates + homogenous coordinates to meshmodel
 	void Object::RecenterAndNormalize(Wavefront_obj& wf) {
 		//recenter
+		
 		glm::vec4 center = { _box._center.x,_box._center.y,_box._center.z,0};
 		for (auto& vertex : _meshModel._points) {
 			vertex -= center;
 		}
+		
 		//normalize
 		glm::vec3 halfRange = (_box._max - _box._min) * 0.5f;
 		float maxHalfRange = std::max({ halfRange.x, halfRange.y, halfRange.z });
 		if (maxHalfRange > 0.0f) {
 			for (auto& vertex : _meshModel._points) {
-				vertex /= maxHalfRange;
+				vertex /= _box.diamitermax;;
 				vertex.w = 1.0f;
 			}
 		}
 	}
+	void Object::GenerateAxis() {
 
+
+		//Create object axis
+
+//due to the fact that the object is already centered and normalized, the axis will be created in the same way
+		_axisPoints.emplace_back(glm::vec4(0, 0, 0, 1.0f));
+		_axisPoints.emplace_back(glm::vec4(0.3, 0, 0, 1.0f));
+		_axisPoints.emplace_back(glm::vec4(0, 0.3, 0, 1.0f));
+		_axisPoints.emplace_back(glm::vec4(0, 0, 0.3, 1.0f));
+
+
+		//Create edges
+		_axisEdges.insert({ 0,1 });
+		_axisEdges.insert({ 0,2 });
+		_axisEdges.insert({ 0,3 });
+	}
 	void Object::ResetMatrices() {
 		_translationMatrix = (1.0f);
 		_rotationMatrix = (1.0f);

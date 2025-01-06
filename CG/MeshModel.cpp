@@ -33,6 +33,7 @@
 		_points.clear();
 		_normals.clear();
 		_edges.clear();
+		
 	}
 
 
