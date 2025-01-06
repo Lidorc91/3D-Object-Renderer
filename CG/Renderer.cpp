@@ -24,20 +24,20 @@ void Renderer::RenderScene(Scene& scene) {
 	std::cout << "Pixels Cleared" << std::endl;
 	//Get Object
 	Object obj = scene.getObject();
-	//Generate Scene Matrix
-	glm::mat4 SceneMatrix = scene.GenerateScene();
+	//Generate Final Matrix
+	glm::mat4 FinalMatrix = _viewportMatrix * scene.GenerateScene();
 	//Adjust to Viewport
 		//Transform Object Vertices
 	for (glm::vec4& point : obj._meshModel._points) {			
 		//Viewport Transform
-		point = _viewportMatrix * SceneMatrix * point;
+		point = FinalMatrix * point;
 		//Perspective Divide
 		point = (point.w == 0) ? point : point/point.w;
 	}
 		//Transform BBox
 	for (glm::vec4& point : obj._box._points) {
 		//Viewport Transform			
-		point = _viewportMatrix * SceneMatrix * point;
+		point = FinalMatrix * point;
 		//Perspective Divide
 		point = (point.w == 0) ? point : point / point.w;
 	}

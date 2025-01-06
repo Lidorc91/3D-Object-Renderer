@@ -15,7 +15,7 @@
 
 	//Generate ALL transformations (before viewport transformations)
 	glm::mat4 Scene::GenerateScene() {
-		//Apply Object Transformations
+		//Apply Object Transformations to model matrix
 		_object.Transform();
 		//Calculate Scene Matrix
 		glm::mat4 SceneMatrix = _camera._projectionMatrix * _camera._viewMatrix * _object._modelMatrix;

@@ -42,6 +42,8 @@ bool g_renderNormals = true;
 void TW_CALL Scale(void* data);
 void TW_CALL Translate(void* data);
 void TW_CALL Rotate(void* data);
+void TW_CALL ResetTransformations(void* data);
+
 	//World Transformations
 void TW_CALL ScaleWorld(void* data);
 void TW_CALL RotateWorld(void* data);
@@ -167,6 +169,7 @@ int main(int argc, char* argv[])
 	TwAddButton(bar, "Apply Object Rotation", Rotate, NULL, " label='Rotate Object' group = 'Transformations'");
 	TwAddButton(bar, "Apply Global Rotation", RotateWorld, NULL, " label='Rotate World' group = 'Transformations'");
 
+	TwAddButton(bar, "Reset Transformations", ResetTransformations, NULL, " label='Reset Transformations' group = 'Transformations'");
 	//World Transformations group
 		//TODO
 
@@ -260,6 +263,12 @@ void TW_CALL Translate(void* data) {
 }
 void TW_CALL Rotate(void* data) {
 	myScene._object.Rotate(g_RotateX,g_RotateY,g_RotateZ);
+	renderer._objectChanged = true;
+}
+
+void TW_CALL ResetTransformations(void* data) {
+	myScene._object._modelMatrix = glm::mat4(1.0f);
+	myScene._camera.ResetViewMatrix();
 	renderer._objectChanged = true;
 }
 

@@ -67,3 +67,10 @@ void Camera::UpdatePerspective(float near, float far, float fov) {
 		0.0f, 0.0f, -float((_far + _near)) / float((_far - _near)), (-2 * float(_far * _near)) / float((_far - _near)),//third column
 		0.0f, 0.0f, -1.0f, 0.0f);
 }
+
+void Camera::ResetViewMatrix() {
+	_eye = { 0.0f, 0.0f, 10.0f };
+	_target = { 0.0f, 0.0f, 0.0f };
+	_up = { 0.0f, 1.0f, 0.0f };
+	UpdateViewer();
+}

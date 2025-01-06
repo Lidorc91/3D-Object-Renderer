@@ -15,6 +15,7 @@ public:
 	void UpdatePerspective(float near, float far, float right, float top);
 	void UpdatePerspective(float near, float far, float fov);
 	void UpdateAspectRatio(float aspect) { _aspectRatio = aspect; UpdatePerspective(_near, _far, _fov); } //Update on Window Resize
+	void ResetViewMatrix();
 	void ResetMatrices() { _viewMatrix = glm::mat4(1.0f); _projectionMatrix = glm::mat4(1.0f); }
 	glm::mat4 _viewMatrix; //position in world
 	glm::mat4 _projectionMatrix; //Distort (perspective->orthogonal) and Project 

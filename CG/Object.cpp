@@ -29,7 +29,7 @@
 		//Trigger relevant transform function
 
 		//final calculation
-		_modelMatrix = _translationMatrix * _rotationMatrix * _scaleMatrix;		
+		_modelMatrix *= _translationMatrix * _rotationMatrix * _scaleMatrix;		
 	}
 
 	void Object::Scale(float s) {
@@ -37,7 +37,6 @@
 			0, s, 0, 0,
 			0, 0, s, 0,
 			0, 0, 0, 1);
-		//Transform();
 		//Update BBox
 	}
 	void Object::Translate(float x, float y, float z) {
@@ -53,6 +52,7 @@
 		glm::mat4 Rz = z != 0 ? rotateZ(z) : glm::mat4(1.0f);
 
 		_rotationMatrix = Rx * Ry * Rz;
+
 		//Transform();
 		//Update BBox
 	}
