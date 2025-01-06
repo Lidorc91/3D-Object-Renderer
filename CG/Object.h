@@ -20,7 +20,9 @@ public:
 	glm::mat4 _rotationMatrix;
 	glm::mat4 _scaleMatrix;
 
-	//config variables
+	std::vector<glm::vec4> _axisPoints;
+	std::set<pair<int, int>> _axisEdges;
+	
 	float _scale = 1.0f;
 	float _translateX = 0.0f;
 	float _translateY = 0.0f;
@@ -34,7 +36,7 @@ public:
 	void RecenterAndNormalize(Wavefront_obj& wf);
 	void Transform();
 	void ResetMatrices();
-	
+	void GenerateAxis();
 	void Scale(float s);
 	void Translate(float x, float y, float z);
 	void Rotate(float x, float y, float z);
