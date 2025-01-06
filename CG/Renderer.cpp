@@ -24,14 +24,11 @@ void Renderer::RenderScene(Scene& scene) {
 	std::cout << "Pixels Cleared" << std::endl;
 	//Get Object
 	Object obj = scene.getObject();
-<<<<<<< HEAD
 	//Generate Final Matrix
 	glm::mat4 FinalMatrix = _viewportMatrix * scene.GenerateScene();
-=======
 	//Generate Scene Matrix
 	glm::mat4 SceneMatrix = scene.GenerateScene();
 	glm::mat4 xSceneMatrix = scene.GenerateScene();
->>>>>>> 22cad5d32e8eafdc4d008fdb3fa6626fa07a9afd
 	//Adjust to Viewport
 		//Transform Object Vertices
 	for (glm::vec4& point : obj._meshModel._points) {			

@@ -275,20 +275,18 @@ void TW_CALL Rotate(void* data) {
 	renderer._objectChanged = true;
 }
 
-<<<<<<< HEAD
 void TW_CALL ResetTransformations(void* data) {
 	myScene._object._modelMatrix = glm::mat4(1.0f);
 	myScene._camera.ResetViewMatrix();
 	renderer._objectChanged = true;
 }
 
-=======
 void TW_CALL Rotateq(void* data) {
 	myScene._object.Rotate(g_quaternion[0]*360, g_quaternion[1] * 360, g_quaternion[2] * 360);
 	myScene._object.Scale(g_quaternion[4]*8);
 	renderer._objectChanged = true;
 }
->>>>>>> 22cad5d32e8eafdc4d008fdb3fa6626fa07a9afd
+
 void TW_CALL ScaleWorld(void* data) {
 	//TODO
 }

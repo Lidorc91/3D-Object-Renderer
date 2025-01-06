@@ -32,13 +32,10 @@
 	void Object::Transform() {
 		//Trigger relevant transform function
 
-<<<<<<< HEAD
 		//final calculation
 		_modelMatrix *= _translationMatrix * _rotationMatrix * _scaleMatrix;		
-=======
 		//final calculation in column major order T*R*S
 		_modelMatrix = _translationMatrix * _rotationMatrix * _scaleMatrix;		
->>>>>>> 22cad5d32e8eafdc4d008fdb3fa6626fa07a9afd
 	}
 
 	void Object::Scale(float s) {
