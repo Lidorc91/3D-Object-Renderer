@@ -34,8 +34,6 @@
 
 		//final calculation
 		_modelMatrix *= _translationMatrix * _rotationMatrix * _scaleMatrix;		
-		//final calculation in column major order T*R*S
-		_modelMatrix = _translationMatrix * _rotationMatrix * _scaleMatrix;		
 	}
 
 	void Object::Scale(float s) {
