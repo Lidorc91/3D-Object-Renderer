@@ -18,13 +18,12 @@ glm::mat4 Scene::GenerateScene() {
 	//Apply Object Transformations
 	//_object.Transform();
 	//Calculate Scene Matrix (Projection * View * Model) for world coordinates in column major order
-	glm::mat4 SceneMatrix = _camera._projectionMatrix * _camera._viewMatrix * _object._modelMatrix;
+	glm::mat4 SceneMatrix = _camera._projectionMatrix * _camera._viewMatrix * _object._worldModelMatrix * _object._objectModelMatrix;
 	//glm::mat4 xSceneMatrix = _camera._projectionMatrix * _camera._viewMatrix ;
 	//Reset Matrices for object
 	_object.ResetMatrices();
 	//Return Scene Matrix
 	return SceneMatrix;
-	//return xSceneMatrix;
 }
 
 Object Scene::getObject() {

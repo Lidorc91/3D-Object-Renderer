@@ -3,7 +3,7 @@
 
 
 //Object creation
-Object::Object() : _modelMatrix(1.0f), _translationMatrix(1.0f), _rotationMatrix(1.0f), _scaleMatrix(1.0f) {
+Object::Object() : _objectModelMatrix(1.0f), _worldModelMatrix(1.0f), _translationMatrix(1.0f), _rotationMatrix(1.0f), _scaleMatrix(1.0f) {
 	_meshModel = MeshModel();
 	_box = BBox();
 }
@@ -16,7 +16,7 @@ void Object::ReadFile(Wavefront_obj& wf) {
 	//Bring obj coordinates to World frame (recenter) + Normalize coordinates + add obj coordinates + homogenous coordinates to meshmodel
 	RecenterAndNormalize(wf);
 	//Isotropic scale by 10
-	Scale(5);
+	Scale(5,ObjectTransform);
 	_WorldAxisPoints.clear();
 	_WorldAxisEdges.clear();
 	_ObjectAxisPoints.clear();
@@ -37,36 +37,48 @@ void Object::Transform() {
 	//Trigger relevant transform function
 
 	//final calculation in column major order T*R*S
-	_modelMatrix = _translationMatrix * _rotationMatrix * _scaleMatrix;
+	_objectModelMatrix = _translationMatrix * _rotationMatrix * _scaleMatrix;
 }
 
-void Object::Scale(float s) {
+void Object::Scale(float s, TransformType t) {
 	_scaleMatrix = glm::mat4(s, 0, 0, 0,
 		0, s, 0, 0,
 		0, 0, s, 0,
 		0, 0, 0, 1);
 
-	_modelMatrix = _scaleMatrix * _modelMatrix;
+	if (t == ObjectTransform)
+		_objectModelMatrix = _scaleMatrix * _objectModelMatrix;
+	else 
+		_worldModelMatrix = _scaleMatrix * _worldModelMatrix;
+	
 
 	//Transform();
 	//Update BBox
 }
-void Object::Translate(float x, float y, float z) {
+void Object::Translate(float x, float y, float z , TransformType t) {
 	_translationMatrix[3] = glm::vec4(x, y, z, 1.0f);
 
-	_modelMatrix = _translationMatrix * _modelMatrix;
+	if (t == ObjectTransform)
+		_objectModelMatrix = _translationMatrix * _objectModelMatrix;
+	else
+		_worldModelMatrix = _translationMatrix * _worldModelMatrix;
+
 	//Transform();
 	//Update BBox
 }
 
-void Object::Rotate(float x, float y, float z) { // TODO - Change to switch case (can only pick 1 axis at a time w/ amount of rotation)
+void Object::Rotate(float x, float y, float z, TransformType t) { // TODO - Change to switch case (can only pick 1 axis at a time w/ amount of rotation)
 	glm::mat4 Rx = x != 0 ? rotateX(x) : glm::mat4(1.0f);
 	glm::mat4 Ry = y != 0 ? rotateY(y) : glm::mat4(1.0f);
 	glm::mat4 Rz = z != 0 ? rotateZ(z) : glm::mat4(1.0f);
 
 	_rotationMatrix = Rx * Ry * Rz;
 
-	_modelMatrix = _rotationMatrix * _modelMatrix;
+	if (t == ObjectTransform)
+		_objectModelMatrix = _rotationMatrix * _objectModelMatrix;
+	else
+		_worldModelMatrix = _rotationMatrix * _worldModelMatrix;
+
 	//Transform();
 	//Update BBox
 }

@@ -9,11 +9,21 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+
+
+enum TransformType
+{
+	ObjectTransform,
+	WorldTransform
+};
+
 class Object
 {
 public:
 	std::string _name;
-	glm::mat4 _modelMatrix; //model matrix -> brings all objects to to world space
+	glm::mat4 _objectModelMatrix; //model matrix -> brings all objects to to world space
+	glm::mat4 _worldModelMatrix; //Transforms in world space
+
 	MeshModel _meshModel; //Geometry data
 	BBox _box;
 	glm::mat4 _translationMatrix;
@@ -33,6 +43,8 @@ public:
 	float _rotateY = 0.0f;
 	float _rotateZ = 0.0f;
 
+	
+
 	Object();
 	void ReadFile(Wavefront_obj& wf);
 	void RecenterAndNormalize(Wavefront_obj& wf);
@@ -40,11 +52,12 @@ public:
 	void ResetMatrices();
 	void GenerateObjectAxis();
 	void GenerateWorldAxis();
-	void Scale(float s);
-	void Translate(float x, float y, float z);
-	void Rotate(float x, float y, float z);
+	void Scale(float s, TransformType t);
+	void Translate(float x, float y, float z, TransformType t);
+	void Rotate(float x, float y, float z, TransformType t);
 	glm::mat4 rotateX(float angle);
 	glm::mat4 rotateY(float angle);
 	glm::mat4 rotateZ(float angle);
 };
+
 

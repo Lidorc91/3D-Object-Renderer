@@ -278,46 +278,47 @@ void TW_CALL loadOBJModel(void* data)
 }
 
 void TW_CALL Object_model(void* data) {
-
-	myScene._object.Scale(g_Scale);
-	myScene._object.Translate(g_TranslateX, g_TranslateY, g_TranslateZ);
-	myScene._object.Rotate(g_RotateX, g_RotateY, g_RotateZ);
+	myScene._object.Scale(g_Scale , ObjectTransform);
+	myScene._object.Translate(g_TranslateX, g_TranslateY, g_TranslateZ, ObjectTransform);
+	myScene._object.Rotate(g_RotateX, g_RotateY, g_RotateZ, ObjectTransform);
 	renderer._WorldModel = false;
 	renderer._objectChanged = true;
 
 }
 void TW_CALL Scale(void* data) {
-	myScene._object.Scale(g_Scale);
+	myScene._object.Scale(g_Scale, ObjectTransform);
 	renderer._objectChanged = true;
 }
 void TW_CALL Translate(void* data) {
-	myScene._object.Translate(g_TranslateX, g_TranslateY, g_TranslateZ);
+	myScene._object.Translate(g_TranslateX, g_TranslateY, g_TranslateZ, ObjectTransform);
 	renderer._objectChanged = true;
 }
 void TW_CALL Rotate(void* data) {
-	myScene._object.Rotate(g_RotateX, g_RotateY, g_RotateZ);
+	myScene._object.Rotate(g_RotateX, g_RotateY, g_RotateZ, ObjectTransform);
 	renderer._objectChanged = true;
 }
 
 void TW_CALL Rotateq(void* data) {
-	myScene._object.Rotate(g_quaternion[0] * 360, g_quaternion[1] * 360, g_quaternion[2] * 360);
-	myScene._object.Scale(g_quaternion[4] * 4);
+	myScene._object.Rotate(g_quaternion[0] * 360, g_quaternion[1] * 360, g_quaternion[2] * 360, ObjectTransform);
+	myScene._object.Scale(g_quaternion[4] * 4, ObjectTransform);
 	renderer._objectChanged = true;
 }
 
 void TW_CALL World_model(void* data) {
 	renderer._WorldModel = true;
-	myScene._object.Scale(Wg_Scale);
-	myScene._object.Translate(Wg_TranslateX, Wg_TranslateY, Wg_TranslateZ);
-	myScene._object.Rotate(Wg_RotateX, Wg_RotateY, Wg_RotateZ);
+	myScene._object.Scale(Wg_Scale, WorldTransform);
+	myScene._object.Translate(Wg_TranslateX, Wg_TranslateY, Wg_TranslateZ, WorldTransform);
+	myScene._object.Rotate(Wg_RotateX, Wg_RotateY, Wg_RotateZ, WorldTransform);
 	renderer._objectChanged = true;
 
 }
 void TW_CALL ScaleWorld(void* data) {
-	World_model(data);
+	myScene._object.Scale(Wg_Scale, WorldTransform);
+	renderer._objectChanged = true;
 }
 void TW_CALL RotateWorld(void* data) {
-	World_model(data);
+	myScene._object.Rotate(Wg_RotateX, Wg_RotateY, Wg_RotateZ, WorldTransform);
+	renderer._objectChanged = true;
 }
 
 void TW_CALL ViewMatrixUpdate(void* data) {
