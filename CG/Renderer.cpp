@@ -49,11 +49,13 @@ void Renderer::RenderScene(Scene& scene) {
 		//Perspective Divide
 		point = (point.w == 0) ? point : point / point.w;
 	}
-
+	//Transform Object Axis
+	//Calculate Object Axis transform matrix
+	glm::mat4 objectAxisTransform = _viewportMatrix* scene._camera._projectionMatrix * scene._camera._viewMatrix * scene._object._worldTranslationMatrix * scene._object._worldRotationMatrix * scene._object._worldScaleMatrix;
 	for (glm::vec4& point : obj._ObjectAxisPoints) {
 		//Viewport Transform
 		if (!_WorldModel)
-			point = FinalMatrix * point;
+			point = objectAxisTransform * point;
 		else
 			point = point * FinalMatrix;
 		//Perspective Divide

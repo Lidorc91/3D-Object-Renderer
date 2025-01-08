@@ -3,7 +3,7 @@
 
 
 //Object creation
-Object::Object() : _objectModelMatrix(1.0f), _worldModelMatrix(1.0f), _translationMatrix(1.0f), _rotationMatrix(1.0f), _scaleMatrix(1.0f) {
+Object::Object() : _objectModelMatrix(1.0f), _worldModelMatrix(1.0f), _objectTranslationMatrix(1.0f), _worldTranslationMatrix(1.0f), _rotationMatrix(1.0f), _scaleMatrix(1.0f) {
 	_meshModel = MeshModel();
 	_box = BBox();
 }
@@ -37,7 +37,7 @@ void Object::Transform() {
 	//Trigger relevant transform function
 
 	//final calculation in column major order T*R*S
-	_objectModelMatrix = _translationMatrix * _rotationMatrix * _scaleMatrix;
+	_objectModelMatrix = _objectTranslationMatrix * _rotationMatrix * _scaleMatrix;
 }
 
 void Object::Scale(float s, TransformType t) {
@@ -48,21 +48,29 @@ void Object::Scale(float s, TransformType t) {
 
 	if (t == ObjectTransform)
 		_objectModelMatrix = _scaleMatrix * _objectModelMatrix;
-	else 
+	else {
+		_worldScaleMatrix = _scaleMatrix * _worldScaleMatrix; // for object axis
 		_worldModelMatrix = _scaleMatrix * _worldModelMatrix;
+	}
 	
 
 	//Transform();
 	//Update BBox
 }
 void Object::Translate(float x, float y, float z , TransformType t) {
-	_translationMatrix[3] = glm::vec4(x, y, z, 1.0f);
+	glm::mat4 translationTemp = glm::mat4(1.0f);
+	translationTemp[3] = glm::vec4(x, y, z, 1.0f);
 
 	if (t == ObjectTransform)
-		_objectModelMatrix = _translationMatrix * _objectModelMatrix;
+		_objectTranslationMatrix = translationTemp * _objectTranslationMatrix;
 	else
-		_worldModelMatrix = _translationMatrix * _worldModelMatrix;
-
+		_worldTranslationMatrix = translationTemp * _worldTranslationMatrix;
+	/*
+	if (t == ObjectTransform)
+		_objectModelMatrix = _objectTranslationMatrix * _objectModelMatrix;
+	else
+		_worldModelMatrix = _objectTranslationMatrix * _worldModelMatrix;
+	*/
 	//Transform();
 	//Update BBox
 }
@@ -75,9 +83,13 @@ void Object::Rotate(float x, float y, float z, TransformType t) { // TODO - Chan
 	_rotationMatrix = Rx * Ry * Rz;
 
 	if (t == ObjectTransform)
+	{
 		_objectModelMatrix = _rotationMatrix * _objectModelMatrix;
-	else
+	}
+	else {
+		_worldRotationMatrix = _rotationMatrix * _worldRotationMatrix; // for object axis
 		_worldModelMatrix = _rotationMatrix * _worldModelMatrix;
+	}
 
 	//Transform();
 	//Update BBox
@@ -169,7 +181,7 @@ void Object::GenerateWorldAxis() {
 
 }
 void Object::ResetMatrices() {
-	_translationMatrix = (1.0f);
+	//_objectTranslationMatrix = (1.0f);
 	_rotationMatrix = (1.0f);
 	_scaleMatrix = (1.0f);
 }

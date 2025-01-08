@@ -26,9 +26,14 @@ public:
 
 	MeshModel _meshModel; //Geometry data
 	BBox _box;
-	glm::mat4 _translationMatrix;
+	glm::mat4 _objectTranslationMatrix;
+	glm::mat4 _worldTranslationMatrix;
 	glm::mat4 _rotationMatrix;
 	glm::mat4 _scaleMatrix;
+
+	//Axis matrices - to scale/rotate axis
+	glm::mat4 _worldRotationMatrix = glm::mat4(1.0f);
+	glm::mat4 _worldScaleMatrix = glm::mat4(1.0f);
 
 	std::vector<glm::vec4> _ObjectAxisPoints;
 	std::set<pair<int, int>> _ObjectAxisEdges;

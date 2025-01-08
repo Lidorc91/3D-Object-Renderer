@@ -51,6 +51,7 @@ void TW_CALL Translate(void* data);
 void TW_CALL Rotate(void* data);
 //World Transformations
 void TW_CALL ScaleWorld(void* data);
+void TW_CALL TranslateWorld(void* data);
 void TW_CALL RotateWorld(void* data);
 //Camera Update
 void TW_CALL ViewMatrixUpdate(void* data);
@@ -166,9 +167,9 @@ int main(int argc, char* argv[])
 	TwAddVarRW(bar, "Scale", TW_TYPE_DOUBLE, &g_Scale, " min=0.01 max=20 step=0.01 keyIncr=s keyDecr=S help='Scale the object (5=original size).' group = 'Object Transformations' ");
 	TwAddButton(bar, "Apply Object Scale", Scale, NULL, " label='Scale Object' group = 'Object Transformations'");
 
-	TwAddVarRW(bar, "TranslateX", TW_TYPE_DOUBLE, &g_TranslateX, " min=0.01 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in X-axis (0=original size).' group = 'Object Transformations'");
-	TwAddVarRW(bar, "TranslateY", TW_TYPE_DOUBLE, &g_TranslateY, " min=0.01 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Y-axis (0=original size).' group = 'Object Transformations'");
-	TwAddVarRW(bar, "TranslateZ", TW_TYPE_DOUBLE, &g_TranslateZ, " min=0.01 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Z-axis (0=original size).' group = 'Object Transformations'");
+	TwAddVarRW(bar, "TranslateX", TW_TYPE_DOUBLE, &g_TranslateX, " min=-50 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in X-axis (0=original size).' group = 'Object Transformations'");
+	TwAddVarRW(bar, "TranslateY", TW_TYPE_DOUBLE, &g_TranslateY, " min=-50 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Y-axis (0=original size).' group = 'Object Transformations'");
+	TwAddVarRW(bar, "TranslateZ", TW_TYPE_DOUBLE, &g_TranslateZ, " min=-50 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Z-axis (0=original size).' group = 'Object Transformations'");
 	TwAddButton(bar, "Apply Object Translate", Translate, NULL, " label='Translate' group = 'Object Transformations'");
 
 	TwAddVarRW(bar, "RotateX", TW_TYPE_DOUBLE, &g_RotateX, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around X-axis (0=original size).' group = 'Object Transformations'");
@@ -183,7 +184,7 @@ int main(int argc, char* argv[])
 	TwAddVarRW(bar, "_TranslateX", TW_TYPE_DOUBLE, &Wg_TranslateX, " min=-50 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in X-axis (0=original size).' group = 'World Transformations'");
 	TwAddVarRW(bar, "_TranslateY", TW_TYPE_DOUBLE, &Wg_TranslateY, " min=-50 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Y-axis (0=original size).' group = 'World Transformations'");
 	TwAddVarRW(bar, "_TranslateZ", TW_TYPE_DOUBLE, &Wg_TranslateZ, " min=-50 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Z-axis (0=original size).' group = 'World Transformations'");
-	TwAddButton(bar, "Apply Global Translate", Translate, NULL, " label='Translate' group = 'World Transformations'");
+	TwAddButton(bar, "Apply Global Translate", TranslateWorld, NULL, " label='Translate' group = 'World Transformations'");
 
 	TwAddVarRW(bar, "_RotateX", TW_TYPE_DOUBLE, &Wg_RotateX, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around X-axis (0=original size).' group = 'World Transformations'");
 	TwAddVarRW(bar, "_RotateY", TW_TYPE_DOUBLE, &Wg_RotateY, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Y-axis (0=original size).' group = 'World Transformations'");
@@ -318,6 +319,11 @@ void TW_CALL ScaleWorld(void* data) {
 }
 void TW_CALL RotateWorld(void* data) {
 	myScene._object.Rotate(Wg_RotateX, Wg_RotateY, Wg_RotateZ, WorldTransform);
+	renderer._objectChanged = true;
+}
+
+void TW_CALL TranslateWorld(void* data) {
+	myScene._object.Translate(Wg_TranslateX, Wg_TranslateY, Wg_TranslateZ, WorldTransform);
 	renderer._objectChanged = true;
 }
 

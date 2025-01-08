@@ -15,10 +15,8 @@ void Scene::setObject(Wavefront_obj& obj) {
 
 //Generate ALL transformations (before viewport transformations)
 glm::mat4 Scene::GenerateScene() {
-	//Apply Object Transformations
-	//_object.Transform();
 	//Calculate Scene Matrix (Projection * View * Model) for world coordinates in column major order
-	glm::mat4 SceneMatrix = _camera._projectionMatrix * _camera._viewMatrix * _object._worldModelMatrix * _object._objectModelMatrix;
+	glm::mat4 SceneMatrix = _camera._projectionMatrix * _camera._viewMatrix * _object._worldTranslationMatrix * _object._worldModelMatrix * _object._objectTranslationMatrix * _object._objectModelMatrix;
 	//glm::mat4 xSceneMatrix = _camera._projectionMatrix * _camera._viewMatrix ;
 	//Reset Matrices for object
 	_object.ResetMatrices();
