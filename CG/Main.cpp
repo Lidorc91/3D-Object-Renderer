@@ -23,16 +23,23 @@ LARGE_INTEGER StartingTime, EndingTime, ElapsedMicroseconds;
 LARGE_INTEGER Frequency;
 
 //TWEEK BAR VARIABLES
-double g_quaternion[4] = {0.0, 0.0, 0.0, 1.0};
+double g_quaternion[4] = { 0.0, 0.0, 0.0, 1.0 };
 
-	//Transformations
-double g_Scale = 1.0;
+//Transformations
+double g_Scale = 5.0;
 double g_TranslateX = 0.0;
 double g_TranslateY = 0.0;
 double g_TranslateZ = 0.0;
 double g_RotateX = 0.0;
 double g_RotateY = 0.0;
-double g_RotateZ = 0.0; 
+double g_RotateZ = 0.0;
+double Wg_Scale = 5.0;
+double Wg_TranslateX = 0.0;
+double Wg_TranslateY = 0.0;
+double Wg_TranslateZ = 0.0;
+double Wg_RotateX = 0.0;
+double Wg_RotateY = 0.0;
+double Wg_RotateZ = 0.0;
 bool g_renderWorldAxis = true;
 bool g_renderBox = true;
 bool g_renderNormals = true;
@@ -42,17 +49,15 @@ bool g_renderObjectAxis = true;
 void TW_CALL Scale(void* data);
 void TW_CALL Translate(void* data);
 void TW_CALL Rotate(void* data);
-void TW_CALL ResetTransformations(void* data);
-
-	//World Transformations
+//World Transformations
 void TW_CALL ScaleWorld(void* data);
 void TW_CALL RotateWorld(void* data);
-	//Camera Update
+//Camera Update
 void TW_CALL ViewMatrixUpdate(void* data);
-	//Projection Update
+//Projection Update
 void TW_CALL ProjectionMatrixUpdateFOV(void* data);
 void TW_CALL ProjectionMatrixUpdateRightTop(void* data);
-	//Render Options
+//Render Options
 void TW_CALL SetRenderBoxState(void* data);
 void TW_CALL SetRenderNormalsState(void* data);
 void TW_CALL SetRenderObjectAxisState(void* data);
@@ -147,51 +152,60 @@ int main(int argc, char* argv[])
 	TwAddVarRW(bar, "P1.y", TW_TYPE_INT32, &g_P1y, " min=-1500 max=750 step=1 keyIncr=y keyDecr=Y help='Point 1 y coordinate' group='Shape Drawing' ");
 	TwAddVarRW(bar, "P2.x", TW_TYPE_INT32, &g_P2x, " min=-1500 max=1500 step=1 keyIncr=a keyDecr=A help='Point 2 x coordinate' group='Shape Drawing' ");
 	TwAddVarRW(bar, "P2.y", TW_TYPE_INT32, &g_P2y, " min=-1500 max=750 step=1 keyIncr=b keyDecr=B help='Point 2 y coordinate' group='Shape Drawing' ");
-		//line color
+	//line color
 	TwAddVarRW(bar, "LineColor", TW_TYPE_COLOR32, &g_LineColor, " label='Line Color' help='Change the color of the line.' group='Shape Drawing'");
-		//shape selector
+	//shape selector
 	TwAddVarRW(bar, "Shape Selector", shapeType, &g_ShapeSelector, " label='Shape Selector' help='Select a shape to display.' group='Shape Drawing'");
-		//time to draw the shape
+	//time to draw the shape
 	TwAddVarRO(bar, "time (us)", TW_TYPE_UINT32, &ElapsedMicroseconds.LowPart, "help='shows the drawing time in micro seconds' group='Shape Drawing'");
-	
+
 	//Load OBJ file
 	TwAddButton(bar, "open", loadOBJModel, NULL, " label='Open OBJ File...' ");
 
-	//Transformations group
-	TwAddVarRW(bar, "Scale", TW_TYPE_DOUBLE, &g_Scale, " min=0.01 max=20 step=0.01 keyIncr=s keyDecr=S help='Scale the object (1=original size).' group = 'Transformations' ");
-	TwAddButton(bar, "Apply Object Scale", Scale, NULL, " label='Scale Object' group = 'Transformations'");
-	TwAddButton(bar, "Apply Global Scale", ScaleWorld, NULL, " label='Scale World' group = 'Transformations'");
+	//Object Transformations group
+	TwAddVarRW(bar, "Scale", TW_TYPE_DOUBLE, &g_Scale, " min=0.01 max=20 step=0.01 keyIncr=s keyDecr=S help='Scale the object (5=original size).' group = 'Object Transformations' ");
+	TwAddButton(bar, "Apply Object Scale", Scale, NULL, " label='Scale Object' group = 'Object Transformations'");
 
-	TwAddVarRW(bar, "TranslateX", TW_TYPE_DOUBLE, &g_TranslateX, " min=0.01 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in X-axis (0=original size).' group = 'Transformations'");
-	TwAddVarRW(bar, "TranslateY", TW_TYPE_DOUBLE, &g_TranslateY, " min=0.01 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Y-axis (0=original size).' group = 'Transformations'");
-	TwAddVarRW(bar, "TranslateZ", TW_TYPE_DOUBLE, &g_TranslateZ, " min=0.01 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Z-axis (0=original size).' group = 'Transformations'");
-	TwAddButton(bar, "Apply Object Translate", Translate, NULL, " label='Translate' group = 'Transformations'");
+	TwAddVarRW(bar, "TranslateX", TW_TYPE_DOUBLE, &g_TranslateX, " min=0.01 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in X-axis (0=original size).' group = 'Object Transformations'");
+	TwAddVarRW(bar, "TranslateY", TW_TYPE_DOUBLE, &g_TranslateY, " min=0.01 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Y-axis (0=original size).' group = 'Object Transformations'");
+	TwAddVarRW(bar, "TranslateZ", TW_TYPE_DOUBLE, &g_TranslateZ, " min=0.01 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Z-axis (0=original size).' group = 'Object Transformations'");
+	TwAddButton(bar, "Apply Object Translate", Translate, NULL, " label='Translate' group = 'Object Transformations'");
 
-	TwAddVarRW(bar, "RotateX", TW_TYPE_DOUBLE, &g_RotateX, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around X-axis (0=original size).' group = 'Transformations'");
-	TwAddVarRW(bar, "RotateY", TW_TYPE_DOUBLE, &g_RotateY, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Y-axis (0=original size).' group = 'Transformations'");
-	TwAddVarRW(bar, "RotateZ", TW_TYPE_DOUBLE, &g_RotateZ, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Z-axis (0=original size).' group = 'Transformations'");
-	TwAddButton(bar, "Apply Object Rotation", Rotate, NULL, " label='Rotate Object' group = 'Transformations'");
-	TwAddButton(bar, "Apply Global Rotation", RotateWorld, NULL, " label='Rotate World' group = 'Transformations'");
+	TwAddVarRW(bar, "RotateX", TW_TYPE_DOUBLE, &g_RotateX, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around X-axis (0=original size).' group = 'Object Transformations'");
+	TwAddVarRW(bar, "RotateY", TW_TYPE_DOUBLE, &g_RotateY, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Y-axis (0=original size).' group = 'Object Transformations'");
+	TwAddVarRW(bar, "RotateZ", TW_TYPE_DOUBLE, &g_RotateZ, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Z-axis (0=original size).' group = 'Object Transformations'");
+	TwAddButton(bar, "Apply Object Rotation", Rotate, NULL, " label='Rotate Object' group = 'Object Transformations'");
 
-	TwAddButton(bar, "Reset Transformations", ResetTransformations, NULL, " label='Reset Transformations' group = 'Transformations'");
 	//World Transformations group
-		//TODO
+	TwAddVarRW(bar, "_Scale", TW_TYPE_DOUBLE, &Wg_Scale, " min=0.01 max=20 step=0.01 keyIncr=s keyDecr=S help='Scale the object (5=original size).' group = 'World Transformations' ");
+	TwAddButton(bar, "Apply Global Scale", ScaleWorld, NULL, " label='Scale World' group = 'World Transformations'");
+
+	TwAddVarRW(bar, "_TranslateX", TW_TYPE_DOUBLE, &Wg_TranslateX, " min=0.01 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in X-axis (0=original size).' group = 'World Transformations'");
+	TwAddVarRW(bar, "_TranslateY", TW_TYPE_DOUBLE, &Wg_TranslateY, " min=0.01 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Y-axis (0=original size).' group = 'World Transformations'");
+	TwAddVarRW(bar, "_TranslateZ", TW_TYPE_DOUBLE, &Wg_TranslateZ, " min=0.01 max=50 step=0.01 keyIncr=s keyDecr=S help='Translate the object in Z-axis (0=original size).' group = 'World Transformations'");
+	TwAddButton(bar, "Apply Global Translate", Translate, NULL, " label='Translate' group = 'World Transformations'");
+
+	TwAddVarRW(bar, "_RotateX", TW_TYPE_DOUBLE, &Wg_RotateX, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around X-axis (0=original size).' group = 'World Transformations'");
+	TwAddVarRW(bar, "_RotateY", TW_TYPE_DOUBLE, &Wg_RotateY, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Y-axis (0=original size).' group = 'World Transformations'");
+	TwAddVarRW(bar, "_RotateZ", TW_TYPE_DOUBLE, &Wg_RotateZ, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Z-axis (0=original size).' group = 'World Transformations'");
+	TwAddButton(bar, "Apply Global Rotation", RotateWorld, NULL, " label='Rotate World' group = 'World Transformations'");
+
 
 	//Camera group
 		//camera position variable
 	TwAddVarRW(bar, "Camera X pos.", TW_TYPE_FLOAT, &myScene._camera._eye.x, " label='x pos. (cam.)' help='Change the camera position.' group = 'Camera'");
 	TwAddVarRW(bar, "Camera Y pos.", TW_TYPE_FLOAT, &myScene._camera._eye.y, " label='y pos. (cam.)' help='Change the camera position.' group = 'Camera'");
 	TwAddVarRW(bar, "Camera Z pos.", TW_TYPE_FLOAT, &myScene._camera._eye.z, " label='z pos. (cam.)' help='Change the camera position.' group = 'Camera'");
-		//camera target variable
+	//camera target variable
 	TwAddVarRW(bar, "Camera Target X", TW_TYPE_FLOAT, &myScene._camera._target.x, " label='x pos. (tar.)' help='Change the camera target.' group = 'Camera'");
 	TwAddVarRW(bar, "Camera Target Y", TW_TYPE_FLOAT, &myScene._camera._target.y, " label='y pos. (tar.)' help='Change the camera target.' group = 'Camera'");
 	TwAddVarRW(bar, "Camera Target Z", TW_TYPE_FLOAT, &myScene._camera._target.z, " label='z pos. (tar.)' help='Change the camera target.' group = 'Camera'");
-		//camera up variable
+	//camera up variable
 	TwAddVarRW(bar, "Camera Up X", TW_TYPE_FLOAT, &myScene._camera._up.x, " label='x pos. (up)' help='Change the camera up.' group = 'Camera'");
 	TwAddVarRW(bar, "Camera Up Y", TW_TYPE_FLOAT, &myScene._camera._up.y, " label='y pos. (up)' help='Change the camera up.' group = 'Camera'");
 	TwAddVarRW(bar, "Camera Up Z", TW_TYPE_FLOAT, &myScene._camera._up.z, " label='z pos. (up)' help='Change the camera up.' group = 'Camera'");
-		//camera configuration - view matrix
-	TwAddButton(bar, "Update Camera", ViewMatrixUpdate , NULL, " label='Update Camera' help='Update the camera view matrix.' group = 'Camera'");
+	//camera configuration - view matrix
+	TwAddButton(bar, "Update Camera", ViewMatrixUpdate, NULL, " label='Update Camera' help='Update the camera view matrix.' group = 'Camera'");
 
 	//Projection group
 		//projection variables
@@ -200,15 +214,15 @@ int main(int argc, char* argv[])
 	TwAddVarRW(bar, "Camera Right", TW_TYPE_FLOAT, &myScene._camera._right, " min=0.1 max=1000 step=0.1 keyIncr=r keyDecr=R help='Change the right of the frustum.' group = 'Projection'");
 	TwAddVarRW(bar, "Camera Top", TW_TYPE_FLOAT, &myScene._camera._top, " min=0.1 max=1000 step=0.1 keyIncr=t keyDecr=T help='Change the top of the frustum.' group = 'Projection'");
 	TwAddVarRW(bar, "Camera FOV", TW_TYPE_FLOAT, &myScene._camera._fov, " min=0.1 max=1000 step=0.1 keyIncr=v keyDecr=V help='Change the field of view.' group = 'Projection'");
-		//projection update
-			//based on right and top
+	//projection update
+		//based on right and top
 	TwAddButton(bar, "Update Camera (right-top)", ProjectionMatrixUpdateRightTop, NULL, " label='Update Right-Top' help='Update the camera perspective.' group = 'Projection'");
-			//based on FOV
+	//based on FOV
 	TwAddButton(bar, "Update Camera (FOV)", ProjectionMatrixUpdateFOV, NULL, " label='Update FOV' help='Update the camera perspective.' group = 'Projection'");
 
 	//add 'g_quaternion' to 'bar': this is a variable of type TW_TYPE_QUAT4D which defines the object's orientation using quaternions
-	TwAddVarRW(bar, "ObjRotation", TW_TYPE_QUAT4D, &g_quaternion, " label='Object rotation' opened=true help='Change the object orientation.' ");
-	TwAddButton(bar, "Apply Object Rotation (quaternion)", Rotateq, NULL, " label='Rotate Object (quaternion)' group = 'ObjRotation'");
+	//TwAddVarRW(bar, "ObjRotation", TW_TYPE_QUAT4D, &g_quaternion, " label='Object rotation' opened=true help='Change the object orientation.' ");
+	//TwAddButton(bar, "Apply Object Rotation (quaternion)", Rotateq, NULL, " label='Rotate Object (quaternion)' group = 'ObjRotation'");
 	//Render Options (Render group)
 	TwAddVarRW(bar, "Render Box", TW_TYPE_BOOLCPP, &g_renderBox, " label='Render Box' key=b help='Toggle rendering of the bounding box.' group = 'Render Options'");
 	TwAddButton(bar, "Apply Box", SetRenderBoxState, NULL, " label='Apply Box' help='Apply the box rendering.' group = 'Render Options'");
@@ -223,7 +237,8 @@ int main(int argc, char* argv[])
 
 	//Default group view settings
 	TwDefine(" TweakBar/'Shape Drawing' opened=true ");
-	TwDefine(" TweakBar/'Transformations' opened=false ");
+	TwDefine(" TweakBar/'Object Transformations' opened=false ");
+	TwDefine(" TweakBar/'World Transformations' opened=false ");
 	TwDefine(" TweakBar/Camera opened=false ");
 	TwDefine(" TweakBar/Projection opened=false ");
 	TwDefine(" TweakBar/'Render Options' opened=false ");
@@ -241,7 +256,7 @@ void TW_CALL loadOBJModel(void* data)
 	Wavefront_obj objScene;
 
 	std::wstring str = getOpenFileName();
-	
+
 	bool result = objScene.load_file(str);
 
 	if (result)
@@ -256,12 +271,21 @@ void TW_CALL loadOBJModel(void* data)
 	{
 		std::cerr << "Failed to load obj file" << std::endl;
 		return;
-	}	
-	
+	}
+
 	std::cout << "The number of vertices in the model is: " << objScene.m_points.size() << std::endl;
 	std::cout << "The number of triangles in the model is: " << objScene.m_faces.size() << std::endl;
 }
 
+void TW_CALL Object_model(void* data) {
+
+	myScene._object.Scale(g_Scale);
+	myScene._object.Translate(g_TranslateX, g_TranslateY, g_TranslateZ);
+	myScene._object.Rotate(g_RotateX, g_RotateY, g_RotateZ);
+	renderer._WorldModel = false;
+	renderer._objectChanged = true;
+
+}
 void TW_CALL Scale(void* data) {
 	myScene._object.Scale(g_Scale);
 	renderer._objectChanged = true;
@@ -271,27 +295,29 @@ void TW_CALL Translate(void* data) {
 	renderer._objectChanged = true;
 }
 void TW_CALL Rotate(void* data) {
-	myScene._object.Rotate(g_RotateX,g_RotateY,g_RotateZ);
-	renderer._objectChanged = true;
-}
-
-void TW_CALL ResetTransformations(void* data) {
-	myScene._object._modelMatrix = glm::mat4(1.0f);
-	myScene._camera.ResetViewMatrix();
+	myScene._object.Rotate(g_RotateX, g_RotateY, g_RotateZ);
 	renderer._objectChanged = true;
 }
 
 void TW_CALL Rotateq(void* data) {
-	myScene._object.Rotate(g_quaternion[0]*360, g_quaternion[1] * 360, g_quaternion[2] * 360);
-	myScene._object.Scale(g_quaternion[4]*8);
+	myScene._object.Rotate(g_quaternion[0] * 360, g_quaternion[1] * 360, g_quaternion[2] * 360);
+	myScene._object.Scale(g_quaternion[4] * 4);
 	renderer._objectChanged = true;
 }
 
+void TW_CALL World_model(void* data) {
+	renderer._WorldModel = true;
+	myScene._object.Scale(Wg_Scale);
+	myScene._object.Translate(Wg_TranslateX, Wg_TranslateY, Wg_TranslateZ);
+	myScene._object.Rotate(Wg_RotateX, Wg_RotateY, Wg_RotateZ);
+	renderer._objectChanged = true;
+
+}
 void TW_CALL ScaleWorld(void* data) {
-	//TODO
+	World_model(data);
 }
 void TW_CALL RotateWorld(void* data) {
-	//TODO
+	World_model(data);
 }
 
 void TW_CALL ViewMatrixUpdate(void* data) {
@@ -311,21 +337,34 @@ void TW_CALL ProjectionMatrixUpdateRightTop(void* data) {
 
 void TW_CALL SetRenderBoxState(void* data) {
 	renderer._enablePrintBox = g_renderBox;
-	renderer._objectChanged = true;
+	if (renderer._WorldModel)
+		World_model(data);
+	else
+		Object_model(data);
+
 }
 
 void TW_CALL SetRenderNormalsState(void* data) {
 	renderer._enablePrintNormals = g_renderNormals;
-	renderer._objectChanged = true;
+	if (renderer._WorldModel)
+		World_model(data);
+	else
+		Object_model(data);
 }
 
 void TW_CALL SetRenderObjectAxisState(void* data) {
 	renderer._objectAxis = g_renderObjectAxis;
-	renderer._objectChanged = true;
+	if (renderer._WorldModel)
+		World_model(data);
+	else
+		Object_model(data);
 }
 void TW_CALL SetRenderWorldAxisState(void* data) {
 	renderer._worldAxis = g_renderWorldAxis;
-	renderer._objectChanged = true;
+	if (renderer._WorldModel)
+		World_model(data);
+	else
+		Object_model(data);
 }
 //do not change this function unless you really know what you are doing!
 void initGraphics(int argc, char* argv[])
@@ -564,11 +603,10 @@ void Display()
 	{
 		//drawObject();
 		renderer.RenderScene(myScene);
-	}		
+	}
 	else {
 		drawScene();
 	}
-	
 
 	//time measuring - don't delete
 	QueryPerformanceCounter(&EndingTime);
@@ -593,7 +631,7 @@ void Reshape(int width, int height)
 	///////add your reshape code here/////////////
 
 	//Update the aspect ratio for camera projection matrix
-	myScene._camera.UpdateAspectRatio(width/height);
+	myScene._camera.UpdateAspectRatio(width / height);
 	//Update the viewport matrix
 	renderer.CalculateViewPortMatrix(width, height);
 
