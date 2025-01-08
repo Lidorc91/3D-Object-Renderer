@@ -25,7 +25,7 @@ void Renderer::RenderScene(Scene& scene) {
 	//Get Object
 	Object obj = scene.getObject();
 	//Generate Scene Matrix
-	glm::mat4 SceneMatrix = scene.GenerateScene();
+	glm::mat4 FinalMatrix = _viewportMatrix * scene.GenerateScene();
 	//glm::mat4 xSceneMatrix = scene.GenerateScene();
 	//Adjust to Viewport
 
@@ -33,9 +33,9 @@ void Renderer::RenderScene(Scene& scene) {
 	for (glm::vec4& point : obj._meshModel._points) {
 		//Viewport Transform
 		if (!_WorldModel)
-			point = _viewportMatrix * SceneMatrix * point;
+			point = FinalMatrix * point;
 		else
-			point = point * _viewportMatrix * SceneMatrix;
+			point = point * FinalMatrix;
 		//Perspective Divide
 		point = (point.w == 0) ? point : point / point.w;
 	}
@@ -43,9 +43,9 @@ void Renderer::RenderScene(Scene& scene) {
 	for (glm::vec4& point : obj._box._boxPoints) {
 		//Viewport Transform			
 		if (!_WorldModel)
-			point = _viewportMatrix * SceneMatrix * point;
+			point = FinalMatrix * point;
 		else
-			point = point * _viewportMatrix * SceneMatrix;
+			point = point * FinalMatrix;
 		//Perspective Divide
 		point = (point.w == 0) ? point : point / point.w;
 	}
@@ -53,9 +53,9 @@ void Renderer::RenderScene(Scene& scene) {
 	for (glm::vec4& point : obj._ObjectAxisPoints) {
 		//Viewport Transform
 		if (!_WorldModel)
-			point = _viewportMatrix * SceneMatrix * point;
+			point = FinalMatrix * point;
 		else
-			point = point * _viewportMatrix * SceneMatrix;
+			point = point * FinalMatrix;
 		//Perspective Divide
 		point = (point.w == 0) ? point : point / point.w;
 	}
@@ -63,7 +63,7 @@ void Renderer::RenderScene(Scene& scene) {
 		//Transform World Axis
 		for (glm::vec4& point : obj._WorldAxisPoints) {
 			//Viewport Transform
-			point = point * _viewportMatrix * SceneMatrix;
+			point = point * FinalMatrix;
 			//Perspective Divide
 			point = (point.w == 0) ? point : point / point.w;
 		}
