@@ -326,9 +326,13 @@ void TW_CALL ViewMatrixUpdate(void* data) {
 }
 
 void TW_CALL CameraLookAt(void* data) {
-	//get current location of objects center from bbox
-	myScene._camera._target = myScene._object._box._center; //IS IT THE CENTER OF THE OBJECT? (did I take transformations on BBOX into account?)
-	myScene._camera.UpdateViewer();
+	//Calculate current center
+	glm::vec4 currentCenter = { myScene._object._box._center.x, myScene._object._box._center.y, myScene._object._box._center.z, 1 };
+	currentCenter = myScene._object._worldTranslationMatrix * myScene._object._objectTranslationMatrix * currentCenter;
+	//update Target
+	myScene._camera._target = glm::vec3(currentCenter); //IS IT THE CENTER OF THE OBJECT? (did I take transformations on BBOX into account?)
+	//Update Camera
+	myScene._camera.UpdateViewer();	
 	renderer._objectChanged = true;
 }
 
