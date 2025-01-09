@@ -42,7 +42,8 @@ double Wg_RotateY = 0.0;
 double Wg_RotateZ = 0.0;
 bool g_renderWorldAxis = true;
 bool g_renderBox = true;
-bool g_renderNormals = true;
+bool g_renderPointNormals = true;
+bool g_renderFaceNormals = true;
 bool g_renderObjectAxis = true;
 //TWEEK BAR FUNCTION DECLARATIONS
 	// Object Transformations
@@ -60,7 +61,8 @@ void TW_CALL ProjectionMatrixUpdateFOV(void* data);
 void TW_CALL ProjectionMatrixUpdateRightTop(void* data);
 //Render Options
 void TW_CALL SetRenderBoxState(void* data);
-void TW_CALL SetRenderNormalsState(void* data);
+void TW_CALL ToggleRenderFaceNormals(void* data);
+void TW_CALL ToggleRenderPointNormals(void* data);
 void TW_CALL SetRenderObjectAxisState(void* data);
 void TW_CALL SetRenderWorldAxisState(void* data);
 //Viewport
@@ -225,15 +227,19 @@ int main(int argc, char* argv[])
 	//TwAddVarRW(bar, "ObjRotation", TW_TYPE_QUAT4D, &g_quaternion, " label='Object rotation' opened=true help='Change the object orientation.' ");
 	//TwAddButton(bar, "Apply Object Rotation (quaternion)", Rotateq, NULL, " label='Rotate Object (quaternion)' group = 'ObjRotation'");
 	//Render Options (Render group)
-	TwAddVarRW(bar, "Render Box", TW_TYPE_BOOLCPP, &g_renderBox, " label='Render Box' key=b help='Toggle rendering of the bounding box.' group = 'Render Options'");
+	TwAddVarRW(bar, "Render Box", TW_TYPE_BOOLCPP, &g_renderBox, " label='Bounding Box' key=b help='Toggle rendering of the bounding box.' group = 'Render Options'");
 	TwAddButton(bar, "Apply Box", SetRenderBoxState, NULL, " label='Apply Box' help='Apply the box rendering.' group = 'Render Options'");
 
-	TwAddVarRW(bar, "Render Normals", TW_TYPE_BOOLCPP, &g_renderNormals, " label='Render Normals' key=n help='Toggle rendering of the normals.' group = 'Render Options'");
-	TwAddButton(bar, "Apply Normals", SetRenderNormalsState, NULL, " label='Apply Normals' help='Apply the normals rendering.' group = 'Render Options'");
+	TwAddVarRW(bar, "Render Face Normals", TW_TYPE_BOOLCPP, &g_renderFaceNormals, " label='Face Normals' key=n help='Toggle rendering of the normals.' group = 'Render Options'");
+	TwAddButton(bar, "Apply Face Normals", ToggleRenderFaceNormals, NULL, " label='Apply Normals' help='Apply the normals rendering.' group = 'Render Options'");
 
-	TwAddVarRW(bar, "Render Object Axis", TW_TYPE_BOOLCPP, &g_renderObjectAxis, " label='Render Object Axis' key=n help='Toggle rendering of the object axis.' group = 'Render Options'");
+	TwAddVarRW(bar, "Render Point Normals", TW_TYPE_BOOLCPP, &g_renderPointNormals, " label='Vertex Normals' key=n help='Toggle rendering of the normals.' group = 'Render Options'");
+	TwAddButton(bar, "Apply Point Normals", ToggleRenderPointNormals, NULL, " label='Apply Normals' help='Apply the normals rendering.' group = 'Render Options'");
+
+
+	TwAddVarRW(bar, "Render Object Axis", TW_TYPE_BOOLCPP, &g_renderObjectAxis, " label='Object Axis' key=n help='Toggle rendering of the object axis.' group = 'Render Options'");
 	TwAddButton(bar, "Apply Object Axis", SetRenderObjectAxisState, NULL, " label='Apply Object Axis' help='Apply the object axis rendering.' group = 'Render Options'");
-	TwAddVarRW(bar, "Render World Axis", TW_TYPE_BOOLCPP, &g_renderWorldAxis, " label='Render World Axis' key=n help='Toggle rendering of the world axis.' group = 'Render Options'");
+	TwAddVarRW(bar, "Render World Axis", TW_TYPE_BOOLCPP, &g_renderWorldAxis, " label='World Axis' key=n help='Toggle rendering of the world axis.' group = 'Render Options'");
 	TwAddButton(bar, "Apply World Axis", SetRenderWorldAxisState, NULL, " label='Apply World Axis' help='Apply the world axis rendering.' group = 'Render Options'");
 
 	//Default group view settings
@@ -278,14 +284,6 @@ void TW_CALL loadOBJModel(void* data)
 	std::cout << "The number of triangles in the model is: " << objScene.m_faces.size() << std::endl;
 }
 
-void TW_CALL Object_model(void* data) {
-	myScene._object.Scale(g_Scale , ObjectTransform);
-	myScene._object.Translate(g_TranslateX, g_TranslateY, g_TranslateZ, ObjectTransform);
-	myScene._object.Rotate(g_RotateX, g_RotateY, g_RotateZ, ObjectTransform);
-	renderer._WorldModel = false;
-	renderer._objectChanged = true;
-
-}
 void TW_CALL Scale(void* data) {
 	myScene._object.Scale(g_Scale, ObjectTransform);
 	renderer._objectChanged = true;
@@ -305,14 +303,6 @@ void TW_CALL Rotateq(void* data) {
 	renderer._objectChanged = true;
 }
 
-void TW_CALL World_model(void* data) {
-	renderer._WorldModel = true;
-	myScene._object.Scale(Wg_Scale, WorldTransform);
-	myScene._object.Translate(Wg_TranslateX, Wg_TranslateY, Wg_TranslateZ, WorldTransform);
-	myScene._object.Rotate(Wg_RotateX, Wg_RotateY, Wg_RotateZ, WorldTransform);
-	renderer._objectChanged = true;
-
-}
 void TW_CALL ScaleWorld(void* data) {
 	myScene._object.Scale(Wg_Scale, WorldTransform);
 	renderer._objectChanged = true;
@@ -344,34 +334,26 @@ void TW_CALL ProjectionMatrixUpdateRightTop(void* data) {
 
 void TW_CALL SetRenderBoxState(void* data) {
 	renderer._enablePrintBox = g_renderBox;
-	if (renderer._WorldModel)
-		World_model(data);
-	else
-		Object_model(data);
-
+	renderer._objectChanged = true;
 }
 
-void TW_CALL SetRenderNormalsState(void* data) {
-	renderer._enablePrintNormals = g_renderNormals;
-	if (renderer._WorldModel)
-		World_model(data);
-	else
-		Object_model(data);
+void TW_CALL ToggleRenderFaceNormals(void* data) {
+	renderer._enablePrintFaceNormals = g_renderFaceNormals;
+	renderer._objectChanged = true;
+}
+
+void TW_CALL ToggleRenderPointNormals(void* data) {
+	renderer._enablePrintPointNormals = g_renderPointNormals;
+	renderer._objectChanged = true;
 }
 
 void TW_CALL SetRenderObjectAxisState(void* data) {
 	renderer._objectAxis = g_renderObjectAxis;
-	if (renderer._WorldModel)
-		World_model(data);
-	else
-		Object_model(data);
+	renderer._objectChanged = true;
 }
 void TW_CALL SetRenderWorldAxisState(void* data) {
 	renderer._worldAxis = g_renderWorldAxis;
-	if (renderer._WorldModel)
-		World_model(data);
-	else
-		Object_model(data);
+	renderer._objectChanged = true;
 }
 //do not change this function unless you really know what you are doing!
 void initGraphics(int argc, char* argv[])

@@ -16,7 +16,8 @@ public:
 	unsigned int color;
 	glm::mat4 _viewportMatrix;
 	bool _enablePrintBox = true;
-	bool _enablePrintNormals = true;
+	bool _enablePrintFaceNormals = false;
+	bool _enablePrintPointNormals = false;
 	bool _objectChanged = true; // Check if object has been changed
 	bool _objectAxis = true;
 	bool _worldAxis = true;
@@ -28,7 +29,8 @@ public:
 	void RenderScene(Scene& scene);
 	void RenderObject(const Object& obj);
 	void RenderBox(const Object& obj);
-	void RenderNormals(const Object& obj);
+	void RenderFaceNormals(const Object& obj);
+	void RenderPointNormals(const Object& obj);
 	void drawLine(int x1, int y1, int x2, int y2, std::vector<Pixel>& pixels, unsigned int color);
 	void drawPixels(const std::vector<Pixel>& pixels);
 

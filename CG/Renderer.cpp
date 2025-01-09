@@ -96,8 +96,11 @@ void Renderer::RenderScene(Scene& scene) {
 	if (_enablePrintBox) {
 		RenderBox(obj);
 	}
-	if (_enablePrintNormals) {
-		RenderNormals(obj);
+	if (_enablePrintFaceNormals) {
+		RenderFaceNormals(obj);
+	}
+	if (_enablePrintPointNormals) {
+		RenderPointNormals(obj);
 	}
 
 	//Draw pixels
@@ -169,8 +172,8 @@ void Renderer::RenderBox(const Object& obj) {
 	}
 }
 
-void Renderer::RenderNormals(const Object& obj) {
-	for (const pair<std::array<int, 3>, glm::vec4>& point : obj._meshModel._normals) {
+void Renderer::RenderFaceNormals(const Object& obj) {
+	for (const pair<std::array<int, 3>, glm::vec4>& point : obj._meshModel._faceNormals) {
 		glm::vec4 centroid = glm::vec4(0, 0, 0, 0);
 		//Calculate Centroid
 		centroid += obj._meshModel._points[point.first[0]];
@@ -184,6 +187,17 @@ void Renderer::RenderNormals(const Object& obj) {
 		//Draw line between points
 		drawLine(static_cast<int>(std::round(centroid.x)), static_cast<int>(std::round(centroid.y)), static_cast<int>(std::round(normalEndpoint.x)), static_cast<int>(std::round(normalEndpoint.y)), _pixels, 0xfffffff);
 	}
+}
+
+void Renderer::RenderPointNormals(const Object& obj) {
+	for (const pair<int, glm::vec4>& point : obj._meshModel._pointNormals) {
+		//Calculate Normal Endpoint
+		float scale = 20.0f;
+		glm::vec4 normalEndpoint = obj._meshModel._points[point.first] + (scale * point.second);
+		//Draw line between points
+		drawLine(static_cast<int>(std::round(obj._meshModel._points[point.first].x)), static_cast<int>(std::round(obj._meshModel._points[point.first].y)), static_cast<int>(std::round(normalEndpoint.x)), static_cast<int>(std::round(normalEndpoint.y)), _pixels, 0xfffffff);
+	}
+
 }
 
 void Renderer::drawLine(int x1, int y1, int x2, int y2, std::vector<Pixel>& pixels, unsigned int color) {
