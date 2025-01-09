@@ -97,7 +97,7 @@ void Renderer::RenderObject(const Object& obj) {
 		int x2 = static_cast<int>(std::round(obj._meshModel._points[edge.second].x));
 		int y2 = static_cast<int>(std::round(obj._meshModel._points[edge.second].y));
 		//Draw line between points
-		drawLine(x1, y1, x2, y2, _pixels, 0xfffffff);
+		drawLine(x1, y1, x2, y2, _pixels, _color);
 	}
 }
 
@@ -112,7 +112,7 @@ void Renderer::RenderBox(const Object& obj) {
 		int y2 = static_cast<int>(std::round(obj._box._boxPoints[boxEdge.second].y));
 
 		//Draw line between points
-		drawLine(x1, y1, x2, y2, _pixels, 0xfffffff);
+		drawLine(x1, y1, x2, y2, _pixels, _color);
 	}
 }
 

@@ -13,8 +13,10 @@ struct Pixel
 class Renderer
 {
 public:
-	unsigned int color;
+	unsigned int _color = 0xfffffffff;
 	glm::mat4 _viewportMatrix;
+
+	//Render options
 	bool _enablePrintBox = true;
 	bool _enablePrintFaceNormals = false;
 	bool _enablePrintPointNormals = false;

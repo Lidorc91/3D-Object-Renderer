@@ -40,11 +40,14 @@ double Wg_TranslateZ = 0.0;
 double Wg_RotateX = 0.0;
 double Wg_RotateY = 0.0;
 double Wg_RotateZ = 0.0;
+//Render Options
 bool g_renderWorldAxis = true;
 bool g_renderBox = true;
 bool g_renderPointNormals = false;
 bool g_renderFaceNormals = false;
 bool g_renderObjectAxis = true;
+unsigned int g_ObjectColor = 0xfffffffff; //white as default
+
 //TWEEK BAR FUNCTION DECLARATIONS
 	// Object Transformations
 void TW_CALL Scale(void* data);
@@ -66,6 +69,8 @@ void TW_CALL ToggleRenderFaceNormals(void* data);
 void TW_CALL ToggleRenderPointNormals(void* data);
 void TW_CALL SetRenderObjectAxisState(void* data);
 void TW_CALL SetRenderWorldAxisState(void* data);
+void TW_CALL SetObjectColor(void* data);
+
 //Viewport
 //Quaternion
 void TW_CALL Rotateq(void* data);
@@ -78,7 +83,7 @@ int g_P1x = 200, g_P1y = 200; //P1
 int g_P2x = 500, g_P2y = 400; //P2
 
 //line color
-unsigned int g_LineColor = 0xffff0000; //red as default
+unsigned int g_LineColor = 0xfffffffff; //red as default
 
 //shape selector
 enum ShapeType {
@@ -165,6 +170,10 @@ int main(int argc, char* argv[])
 
 	//Load OBJ file
 	TwAddButton(bar, "open", loadOBJModel, NULL, " label='Open OBJ File...' ");
+
+	//Object color
+	TwAddVarRW(bar, "ObjectColor", TW_TYPE_COLOR32, &g_ObjectColor, " label='Object Color' help='Change the color of the object.'");
+	TwAddButton(bar, "Change Object Color", SetObjectColor, NULL, " label='Change Color'");
 
 	//Object Transformations group
 	TwAddVarRW(bar, "Scale", TW_TYPE_DOUBLE, &g_Scale, " min=0.01 max=20 step=0.01 keyIncr=s keyDecr=S help='Scale the object (5=original size).' group = 'Object Transformations' ");
@@ -367,6 +376,11 @@ void TW_CALL SetRenderObjectAxisState(void* data) {
 }
 void TW_CALL SetRenderWorldAxisState(void* data) {
 	renderer._worldAxis = g_renderWorldAxis;
+	renderer._objectChanged = true;
+}
+
+void TW_CALL SetObjectColor(void* data) {
+	renderer._color = g_ObjectColor;
 	renderer._objectChanged = true;
 }
 //do not change this function unless you really know what you are doing!
