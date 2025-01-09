@@ -32,68 +32,47 @@ void Renderer::RenderScene(Scene& scene) {
 		//Transform Object Vertices
 	for (glm::vec4& point : obj._meshModel._points) {
 		//Viewport Transform
-		if (!_WorldModel)
-			point = FinalMatrix * point;
-		else
-			point = point * FinalMatrix;
+		point = FinalMatrix * point;
 		//Perspective Divide
 		point = (point.w == 0) ? point : point / point.w;
 	}
-	//Transform BBox
-	for (glm::vec4& point : obj._box._boxPoints) {
-		//Viewport Transform			
-		if (!_WorldModel)
-			point = FinalMatrix * point;
-		else
-			point = point * FinalMatrix;
-		//Perspective Divide
-		point = (point.w == 0) ? point : point / point.w;
-	}
-	//Transform Object Axis
-	//Calculate Object Axis transform matrix
-	glm::mat4 objectAxisTransform = _viewportMatrix* scene._camera._projectionMatrix * scene._camera._viewMatrix * scene._object._worldTranslationMatrix * scene._object._worldRotationMatrix * scene._object._worldScaleMatrix;
-	for (glm::vec4& point : obj._ObjectAxisPoints) {
-		//Viewport Transform
-		if (!_WorldModel)
-			point = objectAxisTransform * point;
-		else
-			point = point * FinalMatrix;
-		//Perspective Divide
-		point = (point.w == 0) ? point : point / point.w;
-	}
-	if (_WorldModel) {
+
+	//Render object	
+	RenderObject(obj);
+
+	if (_worldAxis) {
+		//Calculate World Axis transform matrix
+		glm::mat4 worldAxisTransform = _viewportMatrix * scene._camera._projectionMatrix * scene._camera._viewMatrix;
 		//Transform World Axis
 		for (glm::vec4& point : obj._WorldAxisPoints) {
 			//Viewport Transform
-			point = point * FinalMatrix;
+			point = worldAxisTransform * point;
 			//Perspective Divide
 			point = (point.w == 0) ? point : point / point.w;
 		}
-	}
-
-	/*
-				for (glm::vec4& point : obj._WorldAxisPoints) {
-		//Viewport Transform
-
-		point = point *_viewportMatrix * SceneMatrix ;
-		//Perspective Divide
-		point = (point.w == 0) ? point : point / point.w;
-	}
-	*/
-
-
-
-	//Render scene	
-	RenderObject(obj);
-
-
-	if (_worldAxis) {
+		//Render World Axis
 		RenderWorldAxis(obj);
 	}
 	if (_objectAxis) {
+		glm::mat4 objectAxisTransform = _viewportMatrix * scene._camera._projectionMatrix * scene._camera._viewMatrix * scene._object._worldTranslationMatrix * scene._object._worldRotationMatrix * scene._object._worldScaleMatrix;
+		for (glm::vec4& point : obj._ObjectAxisPoints) {
+			//Viewport Transform
+			point = objectAxisTransform * point;
+			//Perspective Divide
+			point = (point.w == 0) ? point : point / point.w;
+		}
+		//Render Object Axis
 		RenderObjectAxis(obj);
 	}
 	if (_enablePrintBox) {
+		//Transform BBox
+		for (glm::vec4& point : obj._box._boxPoints) {
+			//Viewport Transform			
+			point = FinalMatrix * point;
+			//Perspective Divide
+			point = (point.w == 0) ? point : point / point.w;
+		}
+		//Render BBox
 		RenderBox(obj);
 	}
 	if (_enablePrintFaceNormals) {
@@ -109,7 +88,33 @@ void Renderer::RenderScene(Scene& scene) {
 	_objectChanged = false;
 }
 
+void Renderer::RenderObject(const Object& obj) {
+	//Push Object points to pixels
+	for (const pair<int, int> edge : obj._meshModel._edges) {
+		//Create Integers for points
+		int x1 = static_cast<int>(std::round(obj._meshModel._points[edge.first].x));
+		int y1 = static_cast<int>(std::round(obj._meshModel._points[edge.first].y));
+		int x2 = static_cast<int>(std::round(obj._meshModel._points[edge.second].x));
+		int y2 = static_cast<int>(std::round(obj._meshModel._points[edge.second].y));
+		//Draw line between points
+		drawLine(x1, y1, x2, y2, _pixels, 0xfffffff);
+	}
+}
 
+
+void Renderer::RenderBox(const Object& obj) {
+	//Push BBox points to pixels
+	for (const pair<int, int> boxEdge : obj._box._boxEdges) {
+		//Create Integers for points
+		int x1 = static_cast<int>(std::round(obj._box._boxPoints[boxEdge.first].x));
+		int y1 = static_cast<int>(std::round(obj._box._boxPoints[boxEdge.first].y));
+		int x2 = static_cast<int>(std::round(obj._box._boxPoints[boxEdge.second].x));
+		int y2 = static_cast<int>(std::round(obj._box._boxPoints[boxEdge.second].y));
+
+		//Draw line between points
+		drawLine(x1, y1, x2, y2, _pixels, 0xfffffff);
+	}
+}
 
 void Renderer::RenderObjectAxis(const Object& obj) {
 	//Push Axis points to pixels
@@ -124,9 +129,6 @@ void Renderer::RenderObjectAxis(const Object& obj) {
 	}
 }
 
-
-
-
 void Renderer::RenderWorldAxis(const Object& obj) {
 	//Push Axis points to pixels
 	for (const pair<int, int>& axisEdge : obj._WorldAxisEdges) {
@@ -137,38 +139,6 @@ void Renderer::RenderWorldAxis(const Object& obj) {
 		int y2 = static_cast<int>(std::round(obj._WorldAxisPoints[axisEdge.second].y));
 		//Draw line between points
 		drawLine(x1, y1, x2, y2, _pixels, 0xff64ffff);
-	}
-}
-
-
-
-
-
-
-void Renderer::RenderObject(const Object& obj) {
-	//Push Object points to pixels
-	for (const pair<int, int> edge : obj._meshModel._edges) {
-		//Create Integers for points
-		int x1 = static_cast<int>(std::round(obj._meshModel._points[edge.first].x));
-		int y1 = static_cast<int>(std::round(obj._meshModel._points[edge.first].y));
-		int x2 = static_cast<int>(std::round(obj._meshModel._points[edge.second].x));
-		int y2 = static_cast<int>(std::round(obj._meshModel._points[edge.second].y));
-		//Draw line between points
-		drawLine(x1, y1, x2, y2, _pixels, 0xfffffff);
-	}
-}
-
-void Renderer::RenderBox(const Object& obj) {
-	//Push BBox points to pixels
-	for (const pair<int, int> boxEdge : obj._box._boxEdges) {
-		//Create Integers for points
-		int x1 = static_cast<int>(std::round(obj._box._boxPoints[boxEdge.first].x));
-		int y1 = static_cast<int>(std::round(obj._box._boxPoints[boxEdge.first].y));
-		int x2 = static_cast<int>(std::round(obj._box._boxPoints[boxEdge.second].x));
-		int y2 = static_cast<int>(std::round(obj._box._boxPoints[boxEdge.second].y));
-
-		//Draw line between points
-		drawLine(x1, y1, x2, y2, _pixels, 0xfffffff);
 	}
 }
 

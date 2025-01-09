@@ -42,8 +42,8 @@ double Wg_RotateY = 0.0;
 double Wg_RotateZ = 0.0;
 bool g_renderWorldAxis = true;
 bool g_renderBox = true;
-bool g_renderPointNormals = true;
-bool g_renderFaceNormals = true;
+bool g_renderPointNormals = false;
+bool g_renderFaceNormals = false;
 bool g_renderObjectAxis = true;
 //TWEEK BAR FUNCTION DECLARATIONS
 	// Object Transformations
@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
 	TwAddVarRW(bar, "_RotateY", TW_TYPE_DOUBLE, &Wg_RotateY, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Y-axis (0=original size).' group = 'World Transformations'");
 	TwAddVarRW(bar, "_RotateZ", TW_TYPE_DOUBLE, &Wg_RotateZ, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Z-axis (0=original size).' group = 'World Transformations'");
 	TwAddButton(bar, "Apply Global Rotation", RotateWorld, NULL, " label='Rotate World' group = 'World Transformations'");
-
+	
 
 	//Camera group
 		//camera position variable

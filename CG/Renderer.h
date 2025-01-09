@@ -21,7 +21,7 @@ public:
 	bool _objectChanged = true; // Check if object has been changed
 	bool _objectAxis = true;
 	bool _worldAxis = true;
-	bool _WorldModel = false;
+
 	Renderer();
 	~Renderer();
 	void RenderWorldAxis(const Object& obj);
