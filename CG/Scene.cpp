@@ -19,7 +19,7 @@ glm::mat4 Scene::GenerateScene() {
 	glm::mat4 SceneMatrix = _camera._projectionMatrix * _camera._viewMatrix * _object._worldTranslationMatrix * _object._worldModelMatrix * _object._objectTranslationMatrix * _object._objectModelMatrix;
 	//glm::mat4 xSceneMatrix = _camera._projectionMatrix * _camera._viewMatrix ;
 	//Reset Matrices for object
-	_object.ResetMatrices();
+	//_object.ResetMatrices();
 	//Return Scene Matrix
 	return SceneMatrix;
 }

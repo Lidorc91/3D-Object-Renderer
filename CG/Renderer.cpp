@@ -180,9 +180,11 @@ void Renderer::RenderFaceNormals(const Object& obj) {
 		centroid += obj._meshModel._points[point.first[1]];
 		centroid += obj._meshModel._points[point.first[2]];
 		centroid /= 3.0f;
+		//Caclaute transformed normal (after possible rotations)
+		glm::vec4 transformedNormal = obj._worldRotationMatrix * obj._objectRotationMatrix * point.second;
 		//Calculate Normal Endpoint
 		float scale = 20.0f;
-		glm::vec4 normalEndpoint = centroid + (scale * point.second);
+		glm::vec4 normalEndpoint = centroid + (scale * transformedNormal);		
 
 		//Draw line between points
 		drawLine(static_cast<int>(std::round(centroid.x)), static_cast<int>(std::round(centroid.y)), static_cast<int>(std::round(normalEndpoint.x)), static_cast<int>(std::round(normalEndpoint.y)), _pixels, 0xfffffff);
@@ -191,9 +193,11 @@ void Renderer::RenderFaceNormals(const Object& obj) {
 
 void Renderer::RenderPointNormals(const Object& obj) {
 	for (const pair<int, glm::vec4>& point : obj._meshModel._pointNormals) {
+		//Caclaute transformed normal (after possible rotations)
+		glm::vec4 transformedNormal = obj._worldRotationMatrix * obj._objectRotationMatrix * point.second;
 		//Calculate Normal Endpoint
 		float scale = 20.0f;
-		glm::vec4 normalEndpoint = obj._meshModel._points[point.first] + (scale * point.second);
+		glm::vec4 normalEndpoint = obj._meshModel._points[point.first] + (scale * transformedNormal);
 		//Draw line between points
 		drawLine(static_cast<int>(std::round(obj._meshModel._points[point.first].x)), static_cast<int>(std::round(obj._meshModel._points[point.first].y)), static_cast<int>(std::round(normalEndpoint.x)), static_cast<int>(std::round(normalEndpoint.y)), _pixels, 0xfffffff);
 	}

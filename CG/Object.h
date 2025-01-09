@@ -26,12 +26,13 @@ public:
 
 	MeshModel _meshModel; //Geometry data
 	BBox _box;
+	//Transform matrices - to calculate final translation
 	glm::mat4 _objectTranslationMatrix;
 	glm::mat4 _worldTranslationMatrix;
-	glm::mat4 _rotationMatrix;
+	glm::mat4 _objectRotationMatrix;
 	glm::mat4 _scaleMatrix;
 
-	//Axis matrices - to scale/rotate axis
+	//Axis matrices - to scale/rotate axis & normals
 	glm::mat4 _worldRotationMatrix = glm::mat4(1.0f);
 	glm::mat4 _worldScaleMatrix = glm::mat4(1.0f);
 

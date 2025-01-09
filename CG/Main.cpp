@@ -56,6 +56,7 @@ void TW_CALL TranslateWorld(void* data);
 void TW_CALL RotateWorld(void* data);
 //Camera Update
 void TW_CALL ViewMatrixUpdate(void* data);
+void TW_CALL CameraLookAt(void* data);
 //Projection Update
 void TW_CALL ProjectionMatrixUpdateFOV(void* data);
 void TW_CALL ProjectionMatrixUpdateRightTop(void* data);
@@ -209,6 +210,8 @@ int main(int argc, char* argv[])
 	TwAddVarRW(bar, "Camera Up Z", TW_TYPE_FLOAT, &myScene._camera._up.z, " label='z pos. (up)' help='Change the camera up.' group = 'Camera'");
 	//camera configuration - view matrix
 	TwAddButton(bar, "Update Camera", ViewMatrixUpdate, NULL, " label='Update Camera' help='Update the camera view matrix.' group = 'Camera'");
+	//add Lookat function
+	TwAddButton(bar, "LookAt", CameraLookAt, NULL, " label='Look At' help='Update the camera view matrix.' group = 'Camera'");
 
 	//Projection group
 		//projection variables
@@ -318,6 +321,13 @@ void TW_CALL TranslateWorld(void* data) {
 }
 
 void TW_CALL ViewMatrixUpdate(void* data) {
+	myScene._camera.UpdateViewer();
+	renderer._objectChanged = true;
+}
+
+void TW_CALL CameraLookAt(void* data) {
+	//get current location of objects center from bbox
+	myScene._camera._target = myScene._object._box._center; //IS IT THE CENTER OF THE OBJECT? (did I take transformations on BBOX into account?)
 	myScene._camera.UpdateViewer();
 	renderer._objectChanged = true;
 }
@@ -623,7 +633,7 @@ void Reshape(int width, int height)
 	myScene._camera.UpdateAspectRatio(width / height);
 	//Update the viewport matrix
 	renderer.CalculateViewPortMatrix(width, height);
-
+	renderer._objectChanged = true;
 	//////////////////////////////////////
 
 	// Send the new window size to AntTweakBar
