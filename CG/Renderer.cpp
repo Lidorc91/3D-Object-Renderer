@@ -12,12 +12,26 @@ Renderer::~Renderer()
 }
 
 void Renderer::RenderScene(Scene& scene) {
-	//Check if object has been rendered
+	/*
+	   Function: Rerenders scene
+	   Purpose: Rerender if there was no change in order to reduce redundant computing.
+	*/
 	if (!_objectChanged) {
 		drawPixels(_pixels);
 		std::cout << "Object Rerendered" << std::endl;
 		return;
 	}
+
+	/*
+	   Function: Render Scene
+	   Purpose: Renders scene according to latest updates
+		- Clear Pixels from previous render
+		- Get Object from Scene
+		- Generate Scene Matrix for all the transformations
+		- Transform Object Vertices to Viewport
+		- Choose Rendering Type and Render Object
+		- Additional Rendering Options
+	*/	
 	//Clear Pixels
 	_pixels.clear();
 	std::cout << "Pixels Cleared" << std::endl;
