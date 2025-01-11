@@ -17,6 +17,24 @@ struct LightSource
     glm::vec3 _position = { 0.0f, 0.0f, 0.0f }; // For Point lights
     glm::vec3 _direction = { 0.0f, 0.0f, -1.0f }; // For Directional lights
     glm::vec3 _color = { 1.0f, 1.0f, 1.0f }; // Intensity and color of the light
+
+	void ChangeType(LightType type) {
+		_type = type;
+	}
+
+	void ChangeColor(glm::vec3 color) {
+		_color = color;
+	}
+
+	void ChangePosition(glm::vec3 position) {
+		if (_type == LightType::Point)
+			_position = position;
+	}
+
+	void ChangeDirection(glm::vec3 direction) {
+		if (_type == LightType::Directional)
+		    _direction = direction;
+	}
 };
 
 class Scene
