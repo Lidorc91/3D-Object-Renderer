@@ -39,10 +39,8 @@ void Renderer::RenderScene(Scene& scene) {
 	Object obj = scene.getObject();
 	//Generate Scene Matrix
 	glm::mat4 FinalMatrix = _viewportMatrix * scene.GenerateScene();
-	//glm::mat4 xSceneMatrix = scene.GenerateScene();
-	//Adjust to Viewport
 
-		//Transform Object Vertices
+	//Adjust to Viewport
 	for (glm::vec4& point : obj._meshModel._points) {
 		//Viewport Transform
 		point = FinalMatrix * point;

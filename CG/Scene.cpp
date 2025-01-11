@@ -5,6 +5,9 @@
 //Constructor
 Scene::Scene() : _object() {
 	_hasObject = false;
+	_lightSource1 = LightSource();
+	_lightSourceOptional = LightSource();
+	_ambientLight = LightSource();
 }
 
 // Add an object to the scene
