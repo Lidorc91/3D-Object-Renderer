@@ -4,6 +4,14 @@
 #include <freeglut/include/GL/freeglut.h>
 #include "Scene.h"
 
+enum class RenderType
+{
+	Wireframe,
+	FlatShading,
+	GouraudShading,
+	PhongShading
+};
+
 struct Pixel
 {
 	int  x, y; //pixel in screen coordinates
@@ -23,13 +31,18 @@ public:
 	bool _objectChanged = true; // Check if object has been changed
 	bool _objectAxis = true;
 	bool _worldAxis = true;
+	RenderType _renderType = RenderType::Wireframe;
 
 	Renderer();
 	~Renderer();
+	void RenderWireframe(const Object& obj);
+	void RenderFlatShading(const Object& obj);
+	void RenderGouraudShading(const Object& obj);
+	void RenderPhongShading(const Object& obj);
+
 	void RenderWorldAxis(const Object& obj);
 	void RenderObjectAxis(const Object& obj);
 	void RenderScene(Scene& scene);
-	void RenderWireframe(const Object& obj);
 	void RenderBox(const Object& obj);
 	void RenderFaceNormals(const Object& obj);
 	void RenderPointNormals(const Object& obj);

@@ -6,6 +6,7 @@
 Object::Object() : _objectModelMatrix(1.0f), _worldModelMatrix(1.0f), _objectTranslationMatrix(1.0f), _worldTranslationMatrix(1.0f), _objectRotationMatrix(1.0f), _worldRotationMatrix(1.0f), _scaleMatrix(1.0f) {
 	_meshModel = MeshModel();
 	_box = BBox();
+	_material = Material();
 }
 
 void Object::ReadFile(Wavefront_obj& wf) {

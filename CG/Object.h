@@ -9,7 +9,19 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+struct RGB {
+	float r; // Red (0.0 to 1.0)
+	float g; // Green (0.0 to 1.0)
+	float b; // Blue (0.0 to 1.0)
+};
 
+struct Material
+{
+	float _ambient = 0;
+	float _diffuse = 0;
+	float _specular = 0;
+	RGB _color = { 1,1,1 };
+};
 
 enum TransformType
 {
@@ -21,11 +33,12 @@ class Object
 {
 public:
 	std::string _name;
-	glm::mat4 _objectModelMatrix; //model matrix -> brings all objects to to world space
-	glm::mat4 _worldModelMatrix; //Transforms in world space
-
 	MeshModel _meshModel; //Geometry data
 	BBox _box;
+	Material _material;
+
+	glm::mat4 _objectModelMatrix; //model matrix -> brings all objects to to world space
+	glm::mat4 _worldModelMatrix; //Transforms in world space
 	//Transform matrices - to calculate final translation
 	glm::mat4 _objectTranslationMatrix;
 	glm::mat4 _worldTranslationMatrix;

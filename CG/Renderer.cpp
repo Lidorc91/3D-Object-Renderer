@@ -37,9 +37,26 @@ void Renderer::RenderScene(Scene& scene) {
 		point = (point.w == 0) ? point : point / point.w;
 	}
 
-	//Render object	
-	RenderWireframe(obj);
+	//Choose Rendering Type (Wireframe/Shading type)
+	switch (_renderType) {
+	case RenderType::Wireframe:
+		RenderWireframe(obj);
+		break;
+	
+	case RenderType::FlatShading:
+		RenderFlatShading(obj);
+		break;
+	
+	case RenderType::GouraudShading:
+		RenderGouraudShading(obj);
+		break;
+	
+	case RenderType::PhongShading:
+		RenderPhongShading(obj);
+		break;
+	}
 
+	//Rendering Options
 	if (_worldAxis) {
 		//Calculate World Axis transform matrix
 		glm::mat4 worldAxisTransform = _viewportMatrix * scene._camera._projectionMatrix * scene._camera._viewMatrix;
@@ -99,6 +116,16 @@ void Renderer::RenderWireframe(const Object& obj) {
 		//Draw line between points
 		drawLine(x1, y1, x2, y2, _pixels, _color);
 	}
+}
+
+void Renderer::RenderFlatShading(const Object& obj) {
+	
+}
+
+void Renderer::RenderGouraudShading(const Object& obj) {
+}
+
+void Renderer::RenderPhongShading(const Object& obj) {
 }
 
 
