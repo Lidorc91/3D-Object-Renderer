@@ -29,7 +29,7 @@ public:
 	void RenderWorldAxis(const Object& obj);
 	void RenderObjectAxis(const Object& obj);
 	void RenderScene(Scene& scene);
-	void RenderObject(const Object& obj);
+	void RenderWireframe(const Object& obj);
 	void RenderBox(const Object& obj);
 	void RenderFaceNormals(const Object& obj);
 	void RenderPointNormals(const Object& obj);

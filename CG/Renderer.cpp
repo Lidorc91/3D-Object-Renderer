@@ -38,7 +38,7 @@ void Renderer::RenderScene(Scene& scene) {
 	}
 
 	//Render object	
-	RenderObject(obj);
+	RenderWireframe(obj);
 
 	if (_worldAxis) {
 		//Calculate World Axis transform matrix
@@ -88,7 +88,7 @@ void Renderer::RenderScene(Scene& scene) {
 	_objectChanged = false;
 }
 
-void Renderer::RenderObject(const Object& obj) {
+void Renderer::RenderWireframe(const Object& obj) {
 	//Push Object points to pixels
 	for (const pair<int, int> edge : obj._meshModel._edges) {
 		//Create Integers for points
