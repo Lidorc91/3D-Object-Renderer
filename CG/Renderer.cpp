@@ -1,11 +1,10 @@
 #include "Renderer.h"
 #include <iostream>
 
-
-
 Renderer::Renderer() : _viewportMatrix(1.0f), _pixels()
 {
 	_pixels.reserve(1000000);
+	_shader = Shader();
 }
 
 Renderer::~Renderer()
@@ -44,15 +43,15 @@ void Renderer::RenderScene(Scene& scene) {
 		break;
 	
 	case RenderType::FlatShading:
-		RenderFlatShading(obj);
+		_shader.RenderFlatShading(obj);
 		break;
 	
 	case RenderType::GouraudShading:
-		RenderGouraudShading(obj);
+		_shader.RenderGouraudShading(obj);
 		break;
 	
 	case RenderType::PhongShading:
-		RenderPhongShading(obj);
+		_shader.RenderPhongShading(obj);
 		break;
 	}
 
@@ -117,17 +116,6 @@ void Renderer::RenderWireframe(const Object& obj) {
 		drawLine(x1, y1, x2, y2, _pixels, _color);
 	}
 }
-
-void Renderer::RenderFlatShading(const Object& obj) {
-	
-}
-
-void Renderer::RenderGouraudShading(const Object& obj) {
-}
-
-void Renderer::RenderPhongShading(const Object& obj) {
-}
-
 
 void Renderer::RenderBox(const Object& obj) {
 	//Push BBox points to pixels

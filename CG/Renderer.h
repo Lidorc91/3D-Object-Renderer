@@ -3,6 +3,7 @@
 #include <vector>
 #include <freeglut/include/GL/freeglut.h>
 #include "Scene.h"
+#include "Shader.h"
 
 enum class RenderType
 {
@@ -36,9 +37,6 @@ public:
 	Renderer();
 	~Renderer();
 	void RenderWireframe(const Object& obj);
-	void RenderFlatShading(const Object& obj);
-	void RenderGouraudShading(const Object& obj);
-	void RenderPhongShading(const Object& obj);
 
 	void RenderWorldAxis(const Object& obj);
 	void RenderObjectAxis(const Object& obj);
@@ -53,4 +51,5 @@ public:
 
 private:
 	std::vector<Pixel> _pixels;
+	Shader _shader;
 };
