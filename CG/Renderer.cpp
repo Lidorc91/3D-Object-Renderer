@@ -29,6 +29,8 @@ void Renderer::RenderScene(Scene& scene) {
 		- Get Object from Scene
 		- Generate Scene Matrix for all the transformations
 		- Transform Object Vertices to Viewport
+		- Hidden Surface Removal
+		- Clipping
 		- Choose Rendering Type and Render Object
 		- Additional Rendering Options
 	*/	
@@ -40,14 +42,33 @@ void Renderer::RenderScene(Scene& scene) {
 	//Generate Scene Matrix
 	glm::mat4 FinalMatrix = _viewportMatrix * scene.GenerateScene();
 
+
 	//Adjust to Viewport
-	for (glm::vec4& point : obj._meshModel._points) {
+	for (glm::vec4& point : obj._meshModel._points) { // CHANGE TO ITERATE OVER FACES INSTEAD OF POINTS
 		//Viewport Transform
 		point = FinalMatrix * point;
+		//Clipping
+		
 		//Perspective Divide
 		point = (point.w == 0) ? point : point / point.w;
 	}
 
+	//TEST - iterate over faces from face normals in obj meshmodel
+	for (const auto& faceNormal : obj._meshModel._faceNormals) {
+		//iterate over points in face
+		for (const auto& pointIndex : faceNormal.first) {
+			//Transform Point
+			glm::vec4& point = obj._meshModel._points[pointIndex];
+			//Viewport Transform
+			point = FinalMatrix * point;
+			//Clipping
+			
+			//Perspective Divide
+			point = (point.w == 0) ? point : point / point.w;
+		}
+	}
+
+	
 	//Choose Rendering Type (Wireframe/Shading type)
 	switch (_renderType) {
 	case RenderType::Wireframe:
@@ -55,14 +76,20 @@ void Renderer::RenderScene(Scene& scene) {
 		break;
 	
 	case RenderType::FlatShading:
+		//Hidden Surface Removal
+
 		_shader.RenderFlatShading(obj);
 		break;
 	
 	case RenderType::GouraudShading:
+		//Hidden Surface Removal
+
 		_shader.RenderGouraudShading(obj);
 		break;
 	
 	case RenderType::PhongShading:
+		//Hidden Surface Removal
+
 		_shader.RenderPhongShading(obj);
 		break;
 	}
