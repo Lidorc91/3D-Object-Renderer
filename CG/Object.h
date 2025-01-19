@@ -20,6 +20,7 @@ struct Material
 	float _ambient = 0;
 	float _diffuse = 0;
 	float _specular = 0;
+	float _shininess = 0;
 	RGB _color = { 1,1,1 };
 };
 

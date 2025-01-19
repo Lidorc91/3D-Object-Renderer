@@ -53,6 +53,7 @@ void Renderer::RenderScene(Scene& scene) {
 		point = (point.w == 0) ? point : point / point.w;
 	}
 
+	/*
 	//TEST - iterate over faces from face normals in obj meshmodel
 	for (const auto& faceNormal : obj._meshModel._faceNormals) {
 		//iterate over points in face
@@ -67,6 +68,7 @@ void Renderer::RenderScene(Scene& scene) {
 			point = (point.w == 0) ? point : point / point.w;
 		}
 	}
+	*/
 
 	
 	//Choose Rendering Type (Wireframe/Shading type)
@@ -78,19 +80,19 @@ void Renderer::RenderScene(Scene& scene) {
 	case RenderType::FlatShading:
 		//Hidden Surface Removal
 
-		_shader.RenderFlatShading(obj);
+		_shader.RenderFlatShading(scene);
 		break;
 	
 	case RenderType::GouraudShading:
 		//Hidden Surface Removal
 
-		_shader.RenderGouraudShading(obj);
+		_shader.RenderGouraudShading(scene);
 		break;
 	
 	case RenderType::PhongShading:
 		//Hidden Surface Removal
 
-		_shader.RenderPhongShading(obj);
+		_shader.RenderPhongShading(scene);
 		break;
 	}
 

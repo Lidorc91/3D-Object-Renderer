@@ -14,9 +14,10 @@ enum class LightType
 struct LightSource
 {
     LightType _type = LightType::Directional; // Default to Directional
-    glm::vec3 _position = { 0.0f, 0.0f, 0.0f }; // For Point lights
+    glm::vec4 _position = { 0.0f, 0.0f, 0.0f , 1.0f}; // For Point lights
     glm::vec3 _direction = { 0.0f, 0.0f, -1.0f }; // For Directional lights
     glm::vec3 _color = { 1.0f, 1.0f, 1.0f }; // Intensity and color of the light
+	bool _enabled = true;
 
 	void ChangeType(LightType type) {
 		_type = type;
@@ -26,7 +27,7 @@ struct LightSource
 		_color = color;
 	}
 
-	void ChangePosition(glm::vec3 position) {
+	void ChangePosition(glm::vec4 position) {
 		if (_type == LightType::Point)
 			_position = position;
 	}
