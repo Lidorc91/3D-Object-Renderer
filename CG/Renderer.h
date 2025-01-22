@@ -13,11 +13,7 @@ enum class RenderType
 	PhongShading
 };
 
-struct Pixel
-{
-	int  x, y; //pixel in screen coordinates
-	unsigned int color; //RGBA color format - 4 components of 8 bits each - 0xAABBGGRR - AA alpha, BB blue, RR red
-};
+
 
 class Renderer
 {
@@ -32,7 +28,7 @@ public:
 	bool _objectChanged = true; // Check if object has been changed
 	bool _objectAxis = true;
 	bool _worldAxis = true;
-	RenderType _renderType = RenderType::Wireframe;
+	RenderType _renderType = RenderType::FlatShading;
 
 	Renderer();
 	~Renderer();

@@ -80,19 +80,19 @@ void Renderer::RenderScene(Scene& scene) {
 	case RenderType::FlatShading:
 		//Hidden Surface Removal
 
-		_shader.RenderFlatShading(scene);
+		_shader.RenderFlatShading(scene, _pixels);
 		break;
 	
 	case RenderType::GouraudShading:
 		//Hidden Surface Removal
 
-		_shader.RenderGouraudShading(scene);
+		_shader.RenderGouraudShading(scene, _pixels);
 		break;
 	
 	case RenderType::PhongShading:
 		//Hidden Surface Removal
 
-		_shader.RenderPhongShading(scene);
+		_shader.RenderPhongShading(scene, _pixels);
 		break;
 	}
 
