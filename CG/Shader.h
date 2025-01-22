@@ -13,7 +13,7 @@ class Shader
 public:
 	Shader();
 
-	void RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels);
+	void RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels , Object& tempObj);
 	void RenderGouraudShading(const Scene& scene, std::vector<Pixel>& pixels);
 	void RenderPhongShading(const Scene& scene, std::vector<Pixel>& pixels);
 

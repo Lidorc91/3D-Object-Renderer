@@ -5,10 +5,10 @@
 //Constructor
 Scene::Scene() : _object() {
 	_hasObject = false;
-	_lightSource1 = LightSource();
-	_lightSourceOptional = LightSource();
+	_lightSource1 = LightSource(LightType::Directional);
+	_lightSourceOptional = LightSource(LightType::Point);
 	_lightSourceOptional._enabled = false; //default optional light is off
-	_ambientLight = LightSource();
+	_ambientLight = LightSource(LightType::Ambient);
 }
 
 // Add an object to the scene
