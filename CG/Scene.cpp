@@ -6,7 +6,7 @@
 Scene::Scene() : _object() {
 	_hasObject = false;
 	_lightSource1 = LightSource(LightType::Directional);
-	_lightSourceOptional = LightSource(LightType::Point);
+	_lightSourceOptional = LightSource(LightType::Directional);
 	_lightSourceOptional._enabled = false; //default optional light is off
 	_ambientLight = LightSource(LightType::Ambient);
 }

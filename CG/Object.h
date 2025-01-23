@@ -17,10 +17,10 @@ struct RGB {
 
 struct Material
 {
-	float _ambient = 0;
-	float _diffuse = 0;
-	float _specular = 0;
-	float _shininess = 0;
+	float _ambient = 1;
+	float _diffuse = 1;
+	float _specular = 1;
+	float _shininess = 1;
 	RGB _color = { 1,1,1 };
 };
 

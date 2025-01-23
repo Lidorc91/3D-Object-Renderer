@@ -24,11 +24,20 @@ void Shader::RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels, O
 		//Calculate Centroid
 		glm::vec3 centroid = (tempObj._meshModel._points[faceNormal.first[0]] + tempObj._meshModel._points[faceNormal.first[1]] + tempObj._meshModel._points[faceNormal.first[2]]) / 3.0f;
 		//Calculate Illumination
-		glm::vec3 I = CalculateIllumination(tempObj, scene._lightSource1, faceNormal, centroid, camera) + CalculateIllumination(tempObj, scene._lightSourceOptional, faceNormal, centroid, camera) + CalculateIllumination(tempObj, scene._ambientLight, faceNormal, centroid, camera);
+			//Light source 1
+		glm::vec3 I = CalculateIllumination(tempObj, scene._lightSource1, faceNormal, centroid, camera);
+			//Light source 2 (Optional)
+		I += CalculateIllumination(tempObj, scene._lightSourceOptional, faceNormal, centroid, camera);
+			//Ambient Light
+		I += CalculateIllumination(tempObj, scene._ambientLight, faceNormal, centroid, camera);
 		
 		/* Test - create I that is white */
 		//glm::vec3 I = { 1,0,0 };
-		
+		//I = glm::clamp(I, 0.0f, 1.0f);
+		//Scale to 0-1 without clamp
+
+		I = { I.r / 2, I.g / 2, I.b / 2 };
+
 		//Draw face (add to pixel vector)
 			//scale color to 0-255
 		unsigned int color = 0xff000000 + (static_cast<int>(I.b * 255) << 16) + (static_cast<int>(I.g * 255) << 8) + static_cast<int>(I.r * 255);
@@ -133,6 +142,7 @@ glm::vec3 Shader::CalculateIllumination(const Object& obj, const LightSource& li
 	glm::vec3 I = glm::vec3(0.0f);
 	switch (light._type)
 	{
+		glm::vec3 viewDir;
 	case LightType::Ambient:
 		//Calculate Ambient Light
 		I += calculateAmbient(obj._material, light);
@@ -141,15 +151,16 @@ glm::vec3 Shader::CalculateIllumination(const Object& obj, const LightSource& li
 		//Calculate Diffuse Light
 		I += calculateDiffuse(obj._material, light, faceNormal.second, fragmentPosition);
 		//Calculate Specular Light
-		glm::vec3 viewDir = glm::normalize(camera._eye - fragmentPosition);		
+		viewDir = glm::normalize(camera._eye - fragmentPosition);		
 		I += calculateSpecular(obj._material, light, faceNormal.second, viewDir, fragmentPosition);
 		break;
 	case LightType::Directional:
 		//Calculate Diffuse Light
 		I += calculateDiffuse(obj._material, light, faceNormal.second, fragmentPosition);
 		//Calculate Specular Light
+		viewDir = glm::normalize(camera._eye - fragmentPosition);
+		I += calculateSpecular(obj._material, light, faceNormal.second, viewDir, fragmentPosition);
 		break;
-
 	default:
 		break;
 	}
