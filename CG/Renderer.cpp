@@ -53,6 +53,16 @@ void Renderer::RenderScene(Scene& scene) {
 		point = (point.w == 0) ? point : point / point.w;
 	}
 
+	//Transform Normals 
+	for (pair<std::array<int, 3>, glm::vec4>& point : obj._meshModel._faceNormals) {
+		//Caclaute transformed normal (after possible rotations)
+		point.second = obj._worldRotationMatrix * obj._objectRotationMatrix * point.second;
+	}
+	for (pair<const int, glm::vec4>& point : obj._meshModel._pointNormals) {
+		//Caclaute transformed normal (after possible rotations)
+		point.second = obj._worldRotationMatrix * obj._objectRotationMatrix * point.second;
+	}
+
 	/*
 	//TEST - iterate over faces from face normals in obj meshmodel
 	for (const auto& faceNormal : obj._meshModel._faceNormals) {
@@ -206,11 +216,9 @@ void Renderer::RenderFaceNormals(const Object& obj) {
 		centroid += obj._meshModel._points[point.first[1]];
 		centroid += obj._meshModel._points[point.first[2]];
 		centroid /= 3.0f;
-		//Caclaute transformed normal (after possible rotations)
-		glm::vec4 transformedNormal = obj._worldRotationMatrix * obj._objectRotationMatrix * point.second;
 		//Calculate Normal Endpoint
 		float scale = 20.0f;
-		glm::vec4 normalEndpoint = centroid + (scale * transformedNormal);		
+		glm::vec4 normalEndpoint = centroid + (scale * point.second);
 
 		//Draw line between points
 		drawLine(static_cast<int>(std::round(centroid.x)), static_cast<int>(std::round(centroid.y)), static_cast<int>(std::round(normalEndpoint.x)), static_cast<int>(std::round(normalEndpoint.y)), _pixels, 0xfffffff);
@@ -219,15 +227,12 @@ void Renderer::RenderFaceNormals(const Object& obj) {
 
 void Renderer::RenderPointNormals(const Object& obj) {
 	for (const pair<int, glm::vec4>& point : obj._meshModel._pointNormals) {
-		//Caclaute transformed normal (after possible rotations)
-		glm::vec4 transformedNormal = obj._worldRotationMatrix * obj._objectRotationMatrix * point.second;
 		//Calculate Normal Endpoint
 		float scale = 20.0f;
-		glm::vec4 normalEndpoint = obj._meshModel._points[point.first] + (scale * transformedNormal);
+		glm::vec4 normalEndpoint = obj._meshModel._points[point.first] + (scale * point.second);
 		//Draw line between points
 		drawLine(static_cast<int>(std::round(obj._meshModel._points[point.first].x)), static_cast<int>(std::round(obj._meshModel._points[point.first].y)), static_cast<int>(std::round(normalEndpoint.x)), static_cast<int>(std::round(normalEndpoint.y)), _pixels, 0xfffffff);
 	}
-
 }
 
 void Renderer::drawLine(int x1, int y1, int x2, int y2, std::vector<Pixel>& pixels, unsigned int color) {
