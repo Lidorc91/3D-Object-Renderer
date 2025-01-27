@@ -58,7 +58,9 @@ public:
     //void rasterize(std::vector<Pixel>& pixels); // Convert scene to pixel data
     Scene();
     void setObject(Wavefront_obj& obj);
-    glm::mat4 GenerateScene();
+	glm::mat4 GenerateScene(); //Total transformations
+	glm::mat4 GenerateWorld(); //Object+World transformations
+	glm::mat4 GenerateCameraProjection(); //Camera+Projection transformations
     //std::vector<glm::mat4> Transformations; ADD WHEN IMPLEMENTING MULTIPLE OBJECTS
     Object getObject();
 

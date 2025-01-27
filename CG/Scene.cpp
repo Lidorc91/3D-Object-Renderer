@@ -25,6 +25,20 @@ glm::mat4 Scene::GenerateScene() {
 	return SceneMatrix;
 }
 
+glm::mat4 Scene::GenerateWorld() {
+	//Calculate Scene Matrix (Projection * View * Model) for world coordinates in column major order
+	glm::mat4 WorldMatrix = _object._worldTranslationMatrix * _object._worldModelMatrix * _object._objectTranslationMatrix * _object._objectModelMatrix;
+	//Return Scene Matrix
+	return WorldMatrix;
+}
+
+glm::mat4 Scene::GenerateCameraProjection() {
+	//Calculate Scene Matrix (Projection * View * Model) for world coordinates in column major order
+	glm::mat4 CameraProjectionMatrix = _camera._projectionMatrix * _camera._viewMatrix;
+	//Return Scene Matrix
+	return CameraProjectionMatrix;
+}
+
 Object Scene::getObject() {
 	return _object;
 }

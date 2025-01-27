@@ -28,7 +28,7 @@ public:
 	bool _objectChanged = true; // Check if object has been changed
 	bool _objectAxis = true;
 	bool _worldAxis = true;
-	RenderType _renderType = RenderType::Wireframe;
+	RenderType _renderType = RenderType::FlatShading;
 
 	Renderer();
 	~Renderer();

@@ -5,40 +5,41 @@ Shader::Shader()
 {
 }
 
-void Shader::RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels, Object& tempObj)
+void Shader::RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels, Object& finalObj, Object& worldObj)
 {
 	//aliases for ease of use
 	const Camera& camera = scene._camera;
-	const std::vector<glm::vec4>& points = tempObj._meshModel._points;
+	const std::vector<glm::vec4>& points = finalObj._meshModel._points;
 
 	//for each face in object calculate illumination
-	for (const auto& faceNormal : tempObj._meshModel._faceNormals) {
-		//Aliases for ease of use
+	for (const auto& faceNormal : finalObj._meshModel._faceNormals) {
+		
+
+		//Calculate Centroid
+		glm::vec3 centroid = (worldObj._meshModel._points[faceNormal.first[0]] + worldObj._meshModel._points[faceNormal.first[1]] + worldObj._meshModel._points[faceNormal.first[2]]) / 3.0f;
+		//Calculate Illumination
+			//Light source 1
+		glm::vec3 I = CalculateIllumination(worldObj, scene._lightSource1, faceNormal, centroid, camera);
+			//Light source 2 (Optional)
+		I += CalculateIllumination(worldObj, scene._lightSourceOptional, faceNormal, centroid, camera);
+			//Ambient Light
+		I += CalculateIllumination(worldObj, scene._ambientLight, faceNormal, centroid, camera);
+		
+		/* Test - create I that is white */
+		//glm::vec3 I = { 1,0,0 };
+		I = glm::clamp(I, 0.0f, 1.0f);
+		//Scale to 0-1 without clamp
+
+		//I = { I.r / 2, I.g / 2, I.b / 2 };
+
+		//Draw face (add to pixel vector)
+			//Aliases for ease of use
 		const float& v0x = points[faceNormal.first[0]].x;
 		const float& v0y = points[faceNormal.first[0]].y;
 		const float& v1x = points[faceNormal.first[1]].x;
 		const float& v1y = points[faceNormal.first[1]].y;
 		const float& v2x = points[faceNormal.first[2]].x;
 		const float& v2y = points[faceNormal.first[2]].y;
-
-		//Calculate Centroid
-		glm::vec3 centroid = (tempObj._meshModel._points[faceNormal.first[0]] + tempObj._meshModel._points[faceNormal.first[1]] + tempObj._meshModel._points[faceNormal.first[2]]) / 3.0f;
-		//Calculate Illumination
-			//Light source 1
-		glm::vec3 I = CalculateIllumination(tempObj, scene._lightSource1, faceNormal, centroid, camera);
-			//Light source 2 (Optional)
-		I += CalculateIllumination(tempObj, scene._lightSourceOptional, faceNormal, centroid, camera);
-			//Ambient Light
-		I += CalculateIllumination(tempObj, scene._ambientLight, faceNormal, centroid, camera);
-		
-		/* Test - create I that is white */
-		//glm::vec3 I = { 1,0,0 };
-		//I = glm::clamp(I, 0.0f, 1.0f);
-		//Scale to 0-1 without clamp
-
-		I = { I.r / 2, I.g / 2, I.b / 2 };
-
-		//Draw face (add to pixel vector)
 			//scale color to 0-255
 		unsigned int color = 0xff000000 + (static_cast<int>(I.b * 255) << 16) + (static_cast<int>(I.g * 255) << 8) + static_cast<int>(I.r * 255);
 			//Create bounding box for face
@@ -46,7 +47,7 @@ void Shader::RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels, O
 		float minY = std::min({ v0y, v1y, v2y });
 		float maxX = std::max({ v0x, v1x, v2x });
 		float maxY = std::max({ v0y, v1y, v2y });
-		float denom = ((tempObj._meshModel._points[faceNormal.first[1]].y - tempObj._meshModel._points[faceNormal.first[2]].y) * (tempObj._meshModel._points[faceNormal.first[0]].x - tempObj._meshModel._points[faceNormal.first[2]].x) + (tempObj._meshModel._points[faceNormal.first[2]].x - tempObj._meshModel._points[faceNormal.first[1]].x) * (tempObj._meshModel._points[faceNormal.first[0]].y - tempObj._meshModel._points[faceNormal.first[2]].y));
+		float denom = ((finalObj._meshModel._points[faceNormal.first[1]].y - finalObj._meshModel._points[faceNormal.first[2]].y) * (finalObj._meshModel._points[faceNormal.first[0]].x - finalObj._meshModel._points[faceNormal.first[2]].x) + (finalObj._meshModel._points[faceNormal.first[2]].x - finalObj._meshModel._points[faceNormal.first[1]].x) * (finalObj._meshModel._points[faceNormal.first[0]].y - finalObj._meshModel._points[faceNormal.first[2]].y));
 
 			//Iterate over bounding box and check if it's a barycentric coordinate (shade if it is)
 		for (int y = minY; y <= maxY; y++) {

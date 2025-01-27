@@ -38,13 +38,13 @@ void Renderer::RenderScene(Scene& scene) {
 	_pixels.clear();
 	std::cout << "Pixels Cleared" << std::endl;
 	//Get Object
-	Object obj = scene.getObject();
+	Object objFinal = scene.getObject();
 	//Generate Scene Matrix
 	glm::mat4 FinalMatrix = _viewportMatrix * scene.GenerateScene();
 
 
 	//Adjust to Viewport
-	for (glm::vec4& point : obj._meshModel._points) { // CHANGE TO ITERATE OVER FACES INSTEAD OF POINTS
+	for (glm::vec4& point : objFinal._meshModel._points) { // CHANGE TO ITERATE OVER FACES INSTEAD OF POINTS
 		//Viewport Transform
 		point = FinalMatrix * point;
 		//Clipping
@@ -54,43 +54,34 @@ void Renderer::RenderScene(Scene& scene) {
 	}
 
 	//Transform Normals 
-	for (pair<std::array<int, 3>, glm::vec4>& point : obj._meshModel._faceNormals) {
+	for (pair<std::array<int, 3>, glm::vec4>& point : objFinal._meshModel._faceNormals) {
 		//Caclaute transformed normal (after possible rotations)
-		point.second = obj._worldRotationMatrix * obj._objectRotationMatrix * point.second;
+		point.second = objFinal._worldRotationMatrix * objFinal._objectRotationMatrix * point.second;
 	}
-	for (pair<const int, glm::vec4>& point : obj._meshModel._pointNormals) {
+	for (pair<const int, glm::vec4>& point : objFinal._meshModel._pointNormals) {
 		//Caclaute transformed normal (after possible rotations)
-		point.second = obj._worldRotationMatrix * obj._objectRotationMatrix * point.second;
+		point.second = objFinal._worldRotationMatrix * objFinal._objectRotationMatrix * point.second;
 	}
 
-	/*
-	//TEST - iterate over faces from face normals in obj meshmodel
-	for (const auto& faceNormal : obj._meshModel._faceNormals) {
-		//iterate over points in face
-		for (const auto& pointIndex : faceNormal.first) {
-			//Transform Point
-			glm::vec4& point = obj._meshModel._points[pointIndex];
-			//Viewport Transform
-			point = FinalMatrix * point;
-			//Clipping
-			
-			//Perspective Divide
-			point = (point.w == 0) ? point : point / point.w;
-		}
+	//TEST
+	//2nd object to save point at world coordinates
+	Object obj_world_coordinates = scene.getObject();
+	glm::mat4 WorldMatrix = scene.GenerateWorld();
+	for (glm::vec4& point : obj_world_coordinates._meshModel._points) { 
+		//Viewport Transform
+		point = WorldMatrix * point;		
 	}
-	*/
-
 	
 	//Choose Rendering Type (Wireframe/Shading type)
 	switch (_renderType) {
 	case RenderType::Wireframe:
-		RenderWireframe(obj);
+		RenderWireframe(objFinal);
 		break;
 	
 	case RenderType::FlatShading:
 		//Hidden Surface Removal
 
-		_shader.RenderFlatShading(scene, _pixels , obj);
+		_shader.RenderFlatShading(scene, _pixels , objFinal, obj_world_coordinates);
 		break;
 	
 	case RenderType::GouraudShading:
@@ -111,42 +102,42 @@ void Renderer::RenderScene(Scene& scene) {
 		//Calculate World Axis transform matrix
 		glm::mat4 worldAxisTransform = _viewportMatrix * scene._camera._projectionMatrix * scene._camera._viewMatrix;
 		//Transform World Axis
-		for (glm::vec4& point : obj._WorldAxisPoints) {
+		for (glm::vec4& point : objFinal._WorldAxisPoints) {
 			//Viewport Transform
 			point = worldAxisTransform * point;
 			//Perspective Divide
 			point = (point.w == 0) ? point : point / point.w;
 		}
 		//Render World Axis
-		RenderWorldAxis(obj);
+		RenderWorldAxis(objFinal);
 	}
 	if (_objectAxis) {
 		glm::mat4 objectAxisTransform = _viewportMatrix * scene._camera._projectionMatrix * scene._camera._viewMatrix * scene._object._worldTranslationMatrix * scene._object._worldRotationMatrix * scene._object._worldScaleMatrix;
-		for (glm::vec4& point : obj._ObjectAxisPoints) {
+		for (glm::vec4& point : objFinal._ObjectAxisPoints) {
 			//Viewport Transform
 			point = objectAxisTransform * point;
 			//Perspective Divide
 			point = (point.w == 0) ? point : point / point.w;
 		}
 		//Render Object Axis
-		RenderObjectAxis(obj);
+		RenderObjectAxis(objFinal);
 	}
 	if (_enablePrintBox) {
 		//Transform BBox
-		for (glm::vec4& point : obj._box._boxPoints) {
+		for (glm::vec4& point : objFinal._box._boxPoints) {
 			//Viewport Transform			
 			point = FinalMatrix * point;
 			//Perspective Divide
 			point = (point.w == 0) ? point : point / point.w;
 		}
 		//Render BBox
-		RenderBox(obj);
+		RenderBox(objFinal);
 	}
 	if (_enablePrintFaceNormals) {
-		RenderFaceNormals(obj);
+		RenderFaceNormals(objFinal);
 	}
 	if (_enablePrintPointNormals) {
-		RenderPointNormals(obj);
+		RenderPointNormals(objFinal);
 	}
 
 	//Draw pixels
