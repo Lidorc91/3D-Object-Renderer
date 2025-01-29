@@ -5,7 +5,7 @@ Shader::Shader()
 {
 }
 
-void Shader::RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels, Object& finalObj, Object& worldObj, std::vector<float>& zBuffer, int screenWidth)
+void Shader::RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels, Object& finalObj, Object& worldObj, std::vector<float>& zBuffer, int screenWidth, int screenHeight)
 {
 	//aliases for ease of use
 	const Camera& camera = scene._camera;
@@ -38,39 +38,57 @@ void Shader::RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels, O
 		const float& v1y = points[faceNormal.first[1]].y;
 		const float& v2x = points[faceNormal.first[2]].x;
 		const float& v2y = points[faceNormal.first[2]].y;
+
+		const float& v0z = points[faceNormal.first[0]].z;
+		const float& v1z = points[faceNormal.first[1]].z;
+		const float& v2z = points[faceNormal.first[2]].z;
+		
 			//scale color to 0-255
 		unsigned int color = 0xff000000 + (static_cast<int>(I.b * 255) << 16) + (static_cast<int>(I.g * 255) << 8) + static_cast<int>(I.r * 255);
 			//Create bounding box for face
-		float minX = std::min({ v0x, v1x, v2x });
-		float minY = std::min({ v0y, v1y, v2y });
-		float maxX = std::max({ v0x, v1x, v2x });
-		float maxY = std::max({ v0y, v1y, v2y });
+		int minX = static_cast<int>(std::floor(std::min({ v0x, v1x, v2x }))) < 0 ? 0 : static_cast<int>(std::floor(std::min({ v0x, v1x, v2x })));
+		int minY = static_cast<int>(std::floor(std::min({ v0y, v1y, v2y }))) < 0 ? 0 : static_cast<int>(std::floor(std::min({ v0y, v1y, v2y })));
+		int maxX = static_cast<int>(std::ceil(std::max({ v0x, v1x, v2x }))) > screenWidth ? screenWidth : static_cast<int>(std::ceil(std::max({ v0x, v1x, v2x })));
+		int maxY = static_cast<int>(std::ceil(std::max({ v0y, v1y, v2y }))) > screenHeight ? screenHeight : static_cast<int>(std::ceil(std::max({ v0y, v1y, v2y })));
+		
 		float denom = ((finalObj._meshModel._points[faceNormal.first[1]].y - finalObj._meshModel._points[faceNormal.first[2]].y) * (finalObj._meshModel._points[faceNormal.first[0]].x - finalObj._meshModel._points[faceNormal.first[2]].x) + (finalObj._meshModel._points[faceNormal.first[2]].x - finalObj._meshModel._points[faceNormal.first[1]].x) * (finalObj._meshModel._points[faceNormal.first[0]].y - finalObj._meshModel._points[faceNormal.first[2]].y));
 
 			//Iterate over bounding box and check if it's a barycentric coordinate (shade if it is)
 		for (int y = minY; y <= maxY; y++) {
 			for (int x = minX; x <= maxX; x++) {
 				int index = x + y * screenWidth;
-				if (index > zBuffer.size()) //Check if index is out of bounds
+				if (index < 0 || index > zBuffer.size()) //Check if index is out of bounds
 					continue;
 				//Barycentric coordinates Check & Depth Testing
 				float lambda1 = ((v1y - v2y) * (x - v2x) + (v2x - v1x) * (y - v2y)) / denom;
 				float lambda2 = ((v2y - v0y) * (x - v2x) + (v0x - v2x) * (y - v2y)) / denom;
 				float lambda3 = 1.0f - lambda1 - lambda2;
-					
+
+				//Add vertices manually (with depth testing)
+				if (y == static_cast<int>(v1y) && x == static_cast<int>(v1x))
+					if (zBuffer[index] >= v1z)
+						pixels.push_back({ x,y,color });
+				if (y == static_cast<int>(v2y) && x == static_cast<int>(v2x))
+					if (zBuffer[index] >= v2z)
+						pixels.push_back({ x,y,color });
+				if (y == static_cast<int>(v0y) && x == static_cast<int>(v0x))
+					if (zBuffer[index] >= v0z)
+						pixels.push_back({ x,y,color });							
+			
 				//Depth testing (z-buffer) 
-				if (lambda1 >= 0 && lambda1 <= 1 && lambda2 >= 0 && lambda2 <= 1 && lambda3 >= 0 && lambda3 <= 1) { //Check if it's inside the triangle
-					
+				if (lambda1 >= 0 && lambda1 <=1 && lambda2 >= 0 && lambda2 <= 1 && lambda3 >= 0 && lambda3 <= 1) { //Check if it's inside the triangle
 						//interpolate z using barycentric coordinates
 					float z = lambda1 * points[faceNormal.first[0]].z + lambda2 * points[faceNormal.first[1]].z + lambda3 * points[faceNormal.first[2]].z;
 					if (zBuffer[index] >= z) {
 						zBuffer[index] = z;
 						pixels.push_back({ x,y,color });
 					}					
-				}
-									
+				}									
 			}
 		}
+		
+
+
 	}
 	
 }

@@ -87,7 +87,7 @@ void Renderer::RenderScene(Scene& scene) {
 	case RenderType::FlatShading:
 		//Hidden Surface Removal
 
-		_shader.RenderFlatShading(scene, _pixels , objFinal, obj_world_coordinates, _zBuffer, _width);
+		_shader.RenderFlatShading(scene, _pixels , objFinal, obj_world_coordinates, _zBuffer, _width, _height);
 		break;
 	
 	case RenderType::GouraudShading:
