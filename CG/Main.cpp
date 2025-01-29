@@ -281,6 +281,8 @@ void TW_CALL loadOBJModel(void* data)
 	if (result)
 	{
 		std::cout << "The obj file was loaded successfully" << std::endl;
+		//Reset the scene
+		myScene.Reset();
 		//Add object to scene
 		myScene.setObject(objScene);
 		//Enable object rendering

@@ -37,7 +37,7 @@ void Renderer::RenderScene(Scene& scene) {
 	*/	
 	//Clear Pixels
 	_pixels.clear();
-	std::fill(_zBuffer.begin(), _zBuffer.end(), INFINITY);
+	std::fill(_zBuffer.begin(), _zBuffer.end(), std::numeric_limits<float>::max());
 	std::cout << "Pixels Cleared" << std::endl;
 	//Get Object
 	Object objFinal = scene.getObject();
@@ -87,7 +87,7 @@ void Renderer::RenderScene(Scene& scene) {
 	case RenderType::FlatShading:
 		//Hidden Surface Removal
 
-		_shader.RenderFlatShading(scene, _pixels , objFinal, obj_world_coordinates);
+		_shader.RenderFlatShading(scene, _pixels , objFinal, obj_world_coordinates, _zBuffer, _width);
 		break;
 	
 	case RenderType::GouraudShading:

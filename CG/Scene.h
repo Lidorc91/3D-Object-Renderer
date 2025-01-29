@@ -63,6 +63,7 @@ public:
 	glm::mat4 GenerateCameraProjection(); //Camera+Projection transformations
     //std::vector<glm::mat4> Transformations; ADD WHEN IMPLEMENTING MULTIPLE OBJECTS
     Object getObject();
+	void Reset();
 
 private:
     //glm::mat4 _viewportMatrix;

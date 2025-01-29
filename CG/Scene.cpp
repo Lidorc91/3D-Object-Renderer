@@ -42,3 +42,8 @@ glm::mat4 Scene::GenerateCameraProjection() {
 Object Scene::getObject() {
 	return _object;
 }
+
+void Scene::Reset() {
+	_object = Object();
+	_hasObject = false;
+}

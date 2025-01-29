@@ -5,7 +5,7 @@ Shader::Shader()
 {
 }
 
-void Shader::RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels, Object& finalObj, Object& worldObj)
+void Shader::RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels, Object& finalObj, Object& worldObj, std::vector<float>& zBuffer, int screenWidth)
 {
 	//aliases for ease of use
 	const Camera& camera = scene._camera;
@@ -13,8 +13,6 @@ void Shader::RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels, O
 
 	//for each face in object calculate illumination
 	for (const auto& faceNormal : finalObj._meshModel._faceNormals) {
-		
-
 		//Calculate Centroid
 		glm::vec3 centroid = (worldObj._meshModel._points[faceNormal.first[0]] + worldObj._meshModel._points[faceNormal.first[1]] + worldObj._meshModel._points[faceNormal.first[2]]) / 3.0f;
 		//Calculate Illumination
@@ -52,11 +50,25 @@ void Shader::RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels, O
 			//Iterate over bounding box and check if it's a barycentric coordinate (shade if it is)
 		for (int y = minY; y <= maxY; y++) {
 			for (int x = minX; x <= maxX; x++) {
-				if (CheckBarycentricCoordinates(x, y , v0x, v0y , v1x,v1y,v2x,v2y, denom)) //Check if point is in triangle
-					//Depth testing (z-buffer)
+				int index = x + y * screenWidth;
+				if (index > zBuffer.size()) //Check if index is out of bounds
+					continue;
+				//Barycentric coordinates Check & Depth Testing
+				float lambda1 = ((v1y - v2y) * (x - v2x) + (v2x - v1x) * (y - v2y)) / denom;
+				float lambda2 = ((v2y - v0y) * (x - v2x) + (v0x - v2x) * (y - v2y)) / denom;
+				float lambda3 = 1.0f - lambda1 - lambda2;
 					
-					//Add to pixel vector
-					pixels.push_back({ x,y,color });
+				//Depth testing (z-buffer) 
+				if (lambda1 >= 0 && lambda1 <= 1 && lambda2 >= 0 && lambda2 <= 1 && lambda3 >= 0 && lambda3 <= 1) { //Check if it's inside the triangle
+					
+						//interpolate z using barycentric coordinates
+					float z = lambda1 * points[faceNormal.first[0]].z + lambda2 * points[faceNormal.first[1]].z + lambda3 * points[faceNormal.first[2]].z;
+					if (zBuffer[index] >= z) {
+						zBuffer[index] = z;
+						pixels.push_back({ x,y,color });
+					}					
+				}
+									
 			}
 		}
 	}
@@ -70,6 +82,7 @@ bool Shader::CheckBarycentricCoordinates(int xIndex, int yIndex ,float v0x, floa
 	float lambda3 = 1.0f - lambda1 - lambda2;
 	if (lambda1 >= 0 && lambda1 <= 1 && lambda2 >= 0 && lambda2 <= 1 && lambda3 >= 0 && lambda3 <= 1)
 	{
+
 		return true;
 	}
 	else {
