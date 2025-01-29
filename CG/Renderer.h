@@ -20,6 +20,8 @@ class Renderer
 public:
 	unsigned int _color = 0xfffffffff;
 	glm::mat4 _viewportMatrix;
+	std::vector<float> _zBuffer;
+	int _width, _height;
 
 	//Render options
 	bool _enablePrintBox = true;
@@ -44,7 +46,6 @@ public:
 	void drawPixels(const std::vector<Pixel>& pixels);
 
 	void CalculateViewPortMatrix(int width, int height);
-
 private:
 	std::vector<Pixel> _pixels;
 	Shader _shader;

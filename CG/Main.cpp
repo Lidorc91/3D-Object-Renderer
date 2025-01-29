@@ -647,10 +647,16 @@ void Reshape(int width, int height)
 	//////////////////////////////////////
 	///////add your reshape code here/////////////
 
+	//Update renderer variables
+	renderer._height = height;
+	renderer._width = width;
 	//Update the aspect ratio for camera projection matrix
 	myScene._camera.UpdateAspectRatio(width / height);
 	//Update the viewport matrix
 	renderer.CalculateViewPortMatrix(width, height);
+	//Update the z-buffer
+	renderer._zBuffer.resize(width * height);
+	//Update the object
 	renderer._objectChanged = true;
 	//////////////////////////////////////
 

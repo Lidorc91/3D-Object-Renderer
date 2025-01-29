@@ -5,6 +5,7 @@ Renderer::Renderer() : _viewportMatrix(1.0f), _pixels()
 {
 	_pixels.reserve(1000000);
 	_shader = Shader();
+	_zBuffer = {};
 }
 
 Renderer::~Renderer()
@@ -36,6 +37,7 @@ void Renderer::RenderScene(Scene& scene) {
 	*/	
 	//Clear Pixels
 	_pixels.clear();
+	std::fill(_zBuffer.begin(), _zBuffer.end(), INFINITY);
 	std::cout << "Pixels Cleared" << std::endl;
 	//Get Object
 	Object objFinal = scene.getObject();
@@ -51,6 +53,11 @@ void Renderer::RenderScene(Scene& scene) {
 		
 		//Perspective Divide
 		point = (point.w == 0) ? point : point / point.w;
+		//Update Z-Buffer at index x + y * width
+		int index = std::round(static_cast<int>(point.x)) + std::round(static_cast<int>(point.y)) * _width;
+		if (index > _zBuffer.size())
+			continue;
+		_zBuffer[index] = std::min(_zBuffer[index], point.z);
 	}
 
 	//Transform Normals 
@@ -63,7 +70,6 @@ void Renderer::RenderScene(Scene& scene) {
 		point.second = objFinal._worldRotationMatrix * objFinal._objectRotationMatrix * point.second;
 	}
 
-	//TEST
 	//2nd object to save point at world coordinates
 	Object obj_world_coordinates = scene.getObject();
 	glm::mat4 WorldMatrix = scene.GenerateWorld();
