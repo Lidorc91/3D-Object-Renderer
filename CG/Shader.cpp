@@ -53,6 +53,9 @@ void Shader::RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels, O
 		for (int y = minY; y <= maxY; y++) {
 			for (int x = minX; x <= maxX; x++) {
 				if (CheckBarycentricCoordinates(x, y , v0x, v0y , v1x,v1y,v2x,v2y, denom)) //Check if point is in triangle
+					//Depth testing (z-buffer)
+					
+					//Add to pixel vector
 					pixels.push_back({ x,y,color });
 			}
 		}

@@ -17,7 +17,7 @@ struct RGB {
 
 struct Material
 {
-	float _ambient = 1;
+	float _ambient = 0.2;
 	float _diffuse = 1;
 	float _specular = 1;
 	float _shininess = 1;
