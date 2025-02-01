@@ -17,12 +17,12 @@ void Shader::RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels, O
 		glm::vec3 centroid = (worldObj._meshModel._points[faceNormal.first[0]] + worldObj._meshModel._points[faceNormal.first[1]] + worldObj._meshModel._points[faceNormal.first[2]]) / 3.0f;
 		//Calculate Illumination
 			//Light source 1
-		glm::vec3 I = CalculateIllumination(worldObj, scene._lightSource1, faceNormal, centroid, camera);
-			//Light source 2 (Optional)
-		I += CalculateIllumination(worldObj, scene._lightSourceOptional, faceNormal, centroid, camera);
-			//Ambient Light
-		I += CalculateIllumination(worldObj, scene._ambientLight, faceNormal, centroid, camera);
-		
+		glm::vec3 I = CalculateIllumination(worldObj, scene._lightSource1, faceNormal.second, centroid, camera);
+		//Light source 2 (Optional)
+		I += CalculateIllumination(worldObj, scene._lightSourceOptional, faceNormal.second, centroid, camera);
+		//Ambient Light
+		I += CalculateIllumination(worldObj, scene._ambientLight, faceNormal.second, centroid, camera);
+
 		/* Test - create I that is white */
 		//glm::vec3 I = { 1,0,0 };
 		I = glm::clamp(I, 0.0f, 1.0f);
@@ -42,18 +42,18 @@ void Shader::RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels, O
 		const float& v0z = points[faceNormal.first[0]].z;
 		const float& v1z = points[faceNormal.first[1]].z;
 		const float& v2z = points[faceNormal.first[2]].z;
-		
-			//scale color to 0-255
+
+		//scale color to 0-255
 		unsigned int color = 0xff000000 + (static_cast<int>(I.b * 255) << 16) + (static_cast<int>(I.g * 255) << 8) + static_cast<int>(I.r * 255);
-			//Create bounding box for face
+		//Create bounding box for face
 		int minX = static_cast<int>(std::floor(std::min({ v0x, v1x, v2x }))) < 0 ? 0 : static_cast<int>(std::floor(std::min({ v0x, v1x, v2x })));
 		int minY = static_cast<int>(std::floor(std::min({ v0y, v1y, v2y }))) < 0 ? 0 : static_cast<int>(std::floor(std::min({ v0y, v1y, v2y })));
 		int maxX = static_cast<int>(std::ceil(std::max({ v0x, v1x, v2x }))) > screenWidth ? screenWidth : static_cast<int>(std::ceil(std::max({ v0x, v1x, v2x })));
 		int maxY = static_cast<int>(std::ceil(std::max({ v0y, v1y, v2y }))) > screenHeight ? screenHeight : static_cast<int>(std::ceil(std::max({ v0y, v1y, v2y })));
-		
+
 		float denom = ((finalObj._meshModel._points[faceNormal.first[1]].y - finalObj._meshModel._points[faceNormal.first[2]].y) * (finalObj._meshModel._points[faceNormal.first[0]].x - finalObj._meshModel._points[faceNormal.first[2]].x) + (finalObj._meshModel._points[faceNormal.first[2]].x - finalObj._meshModel._points[faceNormal.first[1]].x) * (finalObj._meshModel._points[faceNormal.first[0]].y - finalObj._meshModel._points[faceNormal.first[2]].y));
 
-			//Iterate over bounding box and check if it's a barycentric coordinate (shade if it is)
+		//Iterate over bounding box and check if it's a barycentric coordinate (shade if it is)
 		for (int y = minY; y <= maxY; y++) {
 			for (int x = minX; x <= maxX; x++) {
 				int index = x + y * screenWidth;
@@ -73,28 +73,29 @@ void Shader::RenderFlatShading(const Scene& scene, std::vector<Pixel>& pixels, O
 						pixels.push_back({ x,y,color });
 				if (y == static_cast<int>(v0y) && x == static_cast<int>(v0x))
 					if (zBuffer[index] >= v0z)
-						pixels.push_back({ x,y,color });							
-			
+						pixels.push_back({ x,y,color });
+
 				//Depth testing (z-buffer) 
-				if (lambda1 >= 0 && lambda1 <=1 && lambda2 >= 0 && lambda2 <= 1 && lambda3 >= 0 && lambda3 <= 1) { //Check if it's inside the triangle
-						//interpolate z using barycentric coordinates
+				if (lambda1 >= 0 && lambda1 <= 1 && lambda2 >= 0 && lambda2 <= 1 && lambda3 >= 0 && lambda3 <= 1) { //Check if it's inside the triangle
+					//interpolate z using barycentric coordinates
 					float z = lambda1 * points[faceNormal.first[0]].z + lambda2 * points[faceNormal.first[1]].z + lambda3 * points[faceNormal.first[2]].z;
 					if (zBuffer[index] >= z) {
 						zBuffer[index] = z;
 						pixels.push_back({ x,y,color });
-					}					
-				}									
+					}
+				}
 			}
 		}
-		
+
 
 
 	}
-	
+
 }
 
 
-bool Shader::CheckBarycentricCoordinates(int xIndex, int yIndex ,float v0x, float v0y ,float v1x, float v1y, float v2x, float v2y, float denom) {
+
+bool Shader::CheckBarycentricCoordinates(int xIndex, int yIndex, float v0x, float v0y, float v1x, float v1y, float v2x, float v2y, float denom) {
 	float lambda1 = ((v1y - v2y) * (xIndex - v2x) + (v2x - v1x) * (yIndex - v2y)) / denom;
 	float lambda2 = ((v2y - v0y) * (xIndex - v2x) + (v0x - v2x) * (yIndex - v2y)) / denom;
 	float lambda3 = 1.0f - lambda1 - lambda2;
@@ -107,14 +108,188 @@ bool Shader::CheckBarycentricCoordinates(int xIndex, int yIndex ,float v0x, floa
 		return false;
 	}
 }
-void Shader::RenderGouraudShading(const Scene& scene, std::vector<Pixel>& pixels)
+void Shader::RenderGouraudShading(const Scene& scene, std::vector<Pixel>& pixels, Object& finalObj, Object& worldObj, std::vector<float>& zBuffer, int screenWidth, int screenHeight)
 {
-	std::cout << "Gouraud Shading" << std::endl;
+	//aliases for ease of use
+	const Camera& camera = scene._camera;
+	const std::vector<glm::vec4>& points = finalObj._meshModel._points;
+
+	//for each face in object calculate illumination
+	for (const auto& faceNormal : finalObj._meshModel._faceNormals) {
+		//Calculate Illumination
+
+		//for (auto& _facePoints : Shader::_facePoints) {
+		for (int i = 0; i < 3; i++) {
+			glm::vec4& point = finalObj._meshModel._points[faceNormal.first[i]];
+			glm::vec4& normal = finalObj._meshModel._pointNormals[faceNormal.first[i]];
+			//Light source 1
+			glm::vec3 I = CalculateIllumination(worldObj, scene._lightSource1, normal, point, camera);
+			//Light source 2 (Optional)
+			I += CalculateIllumination(worldObj, scene._lightSourceOptional, normal, point, camera);
+			//Ambient Light
+			I += CalculateIllumination(worldObj, scene._ambientLight, normal, point, camera);
+
+			/* Test - create I that is white */
+			//glm::vec3 I = { 1,0,0 };
+			I = glm::clamp(I, 0.0f, 1.0f);
+			//Scale to 0-1 without clamp
+			_colorPoint[i].first = I;
+			_colorPoint[i].second = point;
+			//I = { I.r / 2, I.g / 2, I.b / 2 };
+		}
+
+
+
+
+
+		//Draw point (add to pixel vector)
+			//Aliases for ease of use
+		const float& v0x = points[faceNormal.first[0]].x;
+		const float& v0y = points[faceNormal.first[0]].y;
+		const float& v1x = points[faceNormal.first[1]].x;
+		const float& v1y = points[faceNormal.first[1]].y;
+		const float& v2x = points[faceNormal.first[2]].x;
+		const float& v2y = points[faceNormal.first[2]].y;
+
+		const float& v0z = points[faceNormal.first[0]].z;
+		const float& v1z = points[faceNormal.first[1]].z;
+		const float& v2z = points[faceNormal.first[2]].z;
+
+		//scale color to 0-255
+		unsigned int colorPoint0 = 0xff000000 + (static_cast<int>(_colorPoint[0].first.b * 255) << 16) + (static_cast<int>(_colorPoint[0].first.g * 255) << 8) + static_cast<int>(_colorPoint[0].first.r * 255);
+		unsigned int colorPoint1 = 0xff000000 + (static_cast<int>(_colorPoint[1].first.b * 255) << 16) + (static_cast<int>(_colorPoint[1].first.g * 255) << 8) + static_cast<int>(_colorPoint[1].first.r * 255);
+		unsigned int colorPoint2 = 0xff000000 + (static_cast<int>(_colorPoint[2].first.b * 255) << 16) + (static_cast<int>(_colorPoint[2].first.g * 255) << 8) + static_cast<int>(_colorPoint[2].first.r * 255);
+
+		//Create bounding box for face
+		int minX = static_cast<int>(std::floor(std::min({ v0x, v1x, v2x }))) < 0 ? 0 : static_cast<int>(std::floor(std::min({ v0x, v1x, v2x })));
+		int minY = static_cast<int>(std::floor(std::min({ v0y, v1y, v2y }))) < 0 ? 0 : static_cast<int>(std::floor(std::min({ v0y, v1y, v2y })));
+		int maxX = static_cast<int>(std::ceil(std::max({ v0x, v1x, v2x }))) > screenWidth ? screenWidth : static_cast<int>(std::ceil(std::max({ v0x, v1x, v2x })));
+		int maxY = static_cast<int>(std::ceil(std::max({ v0y, v1y, v2y }))) > screenHeight ? screenHeight : static_cast<int>(std::ceil(std::max({ v0y, v1y, v2y })));
+
+		float denom = ((finalObj._meshModel._points[faceNormal.first[1]].y - finalObj._meshModel._points[faceNormal.first[2]].y) * (finalObj._meshModel._points[faceNormal.first[0]].x - finalObj._meshModel._points[faceNormal.first[2]].x) + (finalObj._meshModel._points[faceNormal.first[2]].x - finalObj._meshModel._points[faceNormal.first[1]].x) * (finalObj._meshModel._points[faceNormal.first[0]].y - finalObj._meshModel._points[faceNormal.first[2]].y));
+
+		//Iterate over bounding box and check if it's a barycentric coordinate (shade if it is)
+		for (int y = minY; y <= maxY; y++) {
+			for (int x = minX; x <= maxX; x++) {
+				int index = x + y * screenWidth;
+				if (index < 0 || index > zBuffer.size()) //Check if index is out of bounds
+					continue;
+				//Barycentric coordinates Check & Depth Testing
+				float lambda1 = ((v1y - v2y) * (x - v2x) + (v2x - v1x) * (y - v2y)) / denom;
+				float lambda2 = ((v2y - v0y) * (x - v2x) + (v0x - v2x) * (y - v2y)) / denom;
+				float lambda3 = 1.0f - lambda1 - lambda2;
+
+				//Add vertices manually (with depth testing)
+				if (y == static_cast<int>(v1y) && x == static_cast<int>(v1x))
+					if (zBuffer[index] >= v1z)
+						pixels.push_back({ x,y,colorPoint1 });
+				if (y == static_cast<int>(v2y) && x == static_cast<int>(v2x))
+					if (zBuffer[index] >= v2z)
+						pixels.push_back({ x,y,colorPoint2 });
+				if (y == static_cast<int>(v0y) && x == static_cast<int>(v0x))
+					if (zBuffer[index] >= v0z)
+						pixels.push_back({ x,y,colorPoint0 });
+
+				//Depth testing (z-buffer) 
+				if (lambda1 >= 0 && lambda1 <= 1 && lambda2 >= 0 && lambda2 <= 1 && lambda3 >= 0 && lambda3 <= 1) { //Check if it's inside the triangle
+					//interpolate I using barycentric coordinates
+					glm::vec3 Icolor = lambda1 * _colorPoint[0].first + lambda2 * _colorPoint[1].first + lambda3 * _colorPoint[2].first;
+					unsigned int color = 0xff000000 + (static_cast<int>(Icolor.b * 255) << 16) + (static_cast<int>(Icolor.g * 255) << 8) + static_cast<int>(Icolor.r * 255);
+
+					//interpolate z using barycentric coordinates
+					float z = lambda1 * points[faceNormal.first[0]].z + lambda2 * points[faceNormal.first[1]].z + lambda3 * points[faceNormal.first[2]].z;
+					if (zBuffer[index] >= z) {
+						zBuffer[index] = z;
+						pixels.push_back({ x,y,color });
+					}
+				}
+			}
+		}
+
+
+
+	}
+
 }
 
-void Shader::RenderPhongShading(const Scene& scene, std::vector<Pixel>& pixels)
+void Shader::RenderPhongShading(const Scene& scene, std::vector<Pixel>& pixels, Object& finalObj, Object& worldObj, std::vector<float>& zBuffer, int screenWidth, int screenHeight)
 {
-	std::cout << "Phong Shading" << std::endl;
+	const Camera& camera = scene._camera;
+	const std::vector<glm::vec4>& points = finalObj._meshModel._points;
+
+	//for each face in object calculate illumination
+	for (const auto& faceNormal : finalObj._meshModel._faceNormals) {
+		//Calculate Illumination
+		glm::vec4& normal1 = finalObj._meshModel._pointNormals[faceNormal.first[0]];
+		glm::vec4& normal2 = finalObj._meshModel._pointNormals[faceNormal.first[1]];
+		glm::vec4& normal3 = finalObj._meshModel._pointNormals[faceNormal.first[2]];
+
+
+		//Draw point (add to pixel vector)
+			//Aliases for ease of use
+		const float& v0x = points[faceNormal.first[0]].x;
+		const float& v0y = points[faceNormal.first[0]].y;
+		const float& v1x = points[faceNormal.first[1]].x;
+		const float& v1y = points[faceNormal.first[1]].y;
+		const float& v2x = points[faceNormal.first[2]].x;
+		const float& v2y = points[faceNormal.first[2]].y;
+
+		const float& v0z = points[faceNormal.first[0]].z;
+		const float& v1z = points[faceNormal.first[1]].z;
+		const float& v2z = points[faceNormal.first[2]].z;
+
+		//Create bounding box for face
+		int minX = static_cast<int>(std::floor(std::min({ v0x, v1x, v2x }))) < 0 ? 0 : static_cast<int>(std::floor(std::min({ v0x, v1x, v2x })));
+		int minY = static_cast<int>(std::floor(std::min({ v0y, v1y, v2y }))) < 0 ? 0 : static_cast<int>(std::floor(std::min({ v0y, v1y, v2y })));
+		int maxX = static_cast<int>(std::ceil(std::max({ v0x, v1x, v2x }))) > screenWidth ? screenWidth : static_cast<int>(std::ceil(std::max({ v0x, v1x, v2x })));
+		int maxY = static_cast<int>(std::ceil(std::max({ v0y, v1y, v2y }))) > screenHeight ? screenHeight : static_cast<int>(std::ceil(std::max({ v0y, v1y, v2y })));
+
+		float denom = ((finalObj._meshModel._points[faceNormal.first[1]].y - finalObj._meshModel._points[faceNormal.first[2]].y) * (finalObj._meshModel._points[faceNormal.first[0]].x - finalObj._meshModel._points[faceNormal.first[2]].x) + (finalObj._meshModel._points[faceNormal.first[2]].x - finalObj._meshModel._points[faceNormal.first[1]].x) * (finalObj._meshModel._points[faceNormal.first[0]].y - finalObj._meshModel._points[faceNormal.first[2]].y));
+
+		//Iterate over bounding box and check if it's a barycentric coordinate (shade if it is)
+		for (int y = minY; y <= maxY; y++) {
+			for (int x = minX; x <= maxX; x++) {
+				int index = x + y * screenWidth;
+				if (index < 0 || index > zBuffer.size()) //Check if index is out of bounds
+					continue;
+				//Barycentric coordinates Check & Depth Testing
+				float lambda1 = ((v1y - v2y) * (x - v2x) + (v2x - v1x) * (y - v2y)) / denom;
+				float lambda2 = ((v2y - v0y) * (x - v2x) + (v0x - v2x) * (y - v2y)) / denom;
+				float lambda3 = 1.0f - lambda1 - lambda2;
+
+				//Depth testing (z-buffer) 
+				if (lambda1 >= 0 && lambda1 <= 1 && lambda2 >= 0 && lambda2 <= 1 && lambda3 >= 0 && lambda3 <= 1) { //Check if it's inside the triangle
+					//interpolate I using barycentric coordinates
+					glm::vec4& normal = lambda1 * normal1 + lambda2 * normal2 + lambda3 * normal3;
+					glm::vec4 point = { x,y,0,1 };
+					glm::vec3 I = CalculateIllumination(worldObj, scene._lightSource1, normal, point, camera);
+					//Light source 2 (Optional)
+					I += CalculateIllumination(worldObj, scene._lightSourceOptional, normal, point, camera);
+					//Ambient Light
+					I += CalculateIllumination(worldObj, scene._ambientLight, normal, point, camera);
+					//clamp I to 0-1
+					I = glm::clamp(I, 0.0f, 1.0f);
+					unsigned int color = 0xff000000 + (static_cast<int>(I.b * 255) << 16) + (static_cast<int>(I.g * 255) << 8) + static_cast<int>(I.r * 255);
+					//Add vertices manually (with depth testing)
+					if (y == static_cast<int>(v1y) && x == static_cast<int>(v1x))
+						if (zBuffer[index] >= v1z)
+							pixels.push_back({ x,y,color });
+					if (y == static_cast<int>(v2y) && x == static_cast<int>(v2x))
+						if (zBuffer[index] >= v2z)
+							pixels.push_back({ x,y,color });
+					if (y == static_cast<int>(v0y) && x == static_cast<int>(v0x))
+						if (zBuffer[index] >= v0z)
+							pixels.push_back({ x,y,color });
+					//interpolate z using barycentric coordinates
+					float z = lambda1 * points[faceNormal.first[0]].z + lambda2 * points[faceNormal.first[1]].z + lambda3 * points[faceNormal.first[2]].z;
+					if (zBuffer[index] >= z) {
+						zBuffer[index] = z;
+						pixels.push_back({ x,y,color });
+					}
+				}
+			}
+		}
+	}
 }
 
 //Calculate illumination equation
@@ -169,7 +344,7 @@ glm::vec3 calculateSpecular(const Material& material, const LightSource& light, 
 	return material._specular * light._color * spec;
 }
 
-glm::vec3 Shader::CalculateIllumination(const Object& obj, const LightSource& light,const pair<std::array<int, 3>, glm::vec4>& faceNormal,glm::vec3 fragmentPosition,const Camera& camera)
+glm::vec3 Shader::CalculateIllumination(const Object& obj, const LightSource& light, const glm::vec4& normal, glm::vec3 fragmentPosition, const Camera& camera)
 {
 	if (!light._enabled)
 		return glm::vec3(0.0f);
@@ -184,17 +359,17 @@ glm::vec3 Shader::CalculateIllumination(const Object& obj, const LightSource& li
 		break;
 	case LightType::Point:
 		//Calculate Diffuse Light
-		I += calculateDiffuse(obj._material, light, faceNormal.second, fragmentPosition);
+		I += calculateDiffuse(obj._material, light, normal, fragmentPosition);
 		//Calculate Specular Light
-		viewDir = glm::normalize(camera._eye - fragmentPosition);		
-		I += calculateSpecular(obj._material, light, faceNormal.second, viewDir, fragmentPosition);
+		viewDir = glm::normalize(camera._eye - fragmentPosition);
+		I += calculateSpecular(obj._material, light, normal, viewDir, fragmentPosition);
 		break;
 	case LightType::Directional:
 		//Calculate Diffuse Light
-		I += calculateDiffuse(obj._material, light, faceNormal.second, fragmentPosition);
+		I += calculateDiffuse(obj._material, light, normal, fragmentPosition);
 		//Calculate Specular Light
 		viewDir = glm::normalize(camera._eye - fragmentPosition);
-		I += calculateSpecular(obj._material, light, faceNormal.second, viewDir, fragmentPosition);
+		I += calculateSpecular(obj._material, light, normal, viewDir, fragmentPosition);
 		break;
 	default:
 		break;

@@ -109,6 +109,13 @@ TwEnumVal shapeEnum[] = {
 };
 TwType shapeType;
 
+TwEnumVal lightEnum[] = {
+	{static_cast<int>(LightType::Point), "Point"},
+	{static_cast<int>(LightType::Directional), "Directional"},
+	{static_cast<int>(LightType::Ambient), "Ambient"}
+};
+TwType lightType;
+
 void TW_CALL loadOBJModel(void* clientData);
 void initScene();
 void initGraphics(int argc, char* argv[]);
@@ -151,7 +158,7 @@ int main(int argc, char* argv[])
 	TwBar* bar = TwNewBar("TweakBar");
 
 	shapeType = TwDefineEnum("ShapeType", shapeEnum, 6);
-
+	lightType = TwDefineEnum("LightType", lightEnum, 3);
 	TwDefine(" GLOBAL help='This example shows how to integrate AntTweakBar with GLUT and OpenGL.' "); // Message added to the help bar.
 	TwDefine(" TweakBar size='200 400' color='96 216 224' "); // change default tweak bar size and color
 
@@ -167,7 +174,15 @@ int main(int argc, char* argv[])
 	TwAddVarRW(bar, "Shape Selector", shapeType, &g_ShapeSelector, " label='Shape Selector' help='Select a shape to display.' group='Shape Drawing'");
 	//time to draw the shape
 	TwAddVarRO(bar, "time (us)", TW_TYPE_UINT32, &ElapsedMicroseconds.LowPart, "help='shows the drawing time in micro seconds' group='Shape Drawing'");
+	//light selector
+	TwAddVarRW(bar, "Light 1 Source Selector", lightType, &myScene._lightSource1._type, " label='Light Selector' help='Select a light to display.' group='Lighting'");
 
+	//TwAddVarRW(bar, "lightdir1", TW_TYPE_DIR3D, &obj.light.light1, "help='RGB colors' group='Lighting' ");
+	TwAddVarRW(bar, "lightdir1", TW_TYPE_DIR3D, &myScene._lightSource1._direction, "help='RGB colors' group='Lighting' ");
+
+	TwAddVarRW(bar, "Light 2 Source Selector", lightType, &myScene._lightSourceOptional._type, " label='Light Selector' help='Select a light to display.' group='Lighting'");
+	//TwAddVarRW(bar, "lightdir2", TW_TYPE_DIR3D, &obj.light.light2, "help='RGB colors' group='Light2' ");
+	TwAddVarRW(bar, "Enable Light 2", TW_TYPE_BOOLCPP, &myScene._lightSourceOptional._enabled, " label='Enable Light 2' key=n help='Enable optional light.' group = 'Lighting'");
 	//Load OBJ file
 	TwAddButton(bar, "open", loadOBJModel, NULL, " label='Open OBJ File...' ");
 
@@ -202,7 +217,7 @@ int main(int argc, char* argv[])
 	TwAddVarRW(bar, "_RotateY", TW_TYPE_DOUBLE, &Wg_RotateY, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Y-axis (0=original size).' group = 'World Transformations'");
 	TwAddVarRW(bar, "_RotateZ", TW_TYPE_DOUBLE, &Wg_RotateZ, " min=0.0 max=360 step=1 keyIncr=s keyDecr=S help='Rotate the object around Z-axis (0=original size).' group = 'World Transformations'");
 	TwAddButton(bar, "Apply Global Rotation", RotateWorld, NULL, " label='Rotate World' group = 'World Transformations'");
-	
+
 
 	//Camera group
 		//camera position variable
@@ -343,7 +358,7 @@ void TW_CALL CameraLookAt(void* data) {
 	//update Target
 	myScene._camera._target = glm::vec3(currentCenter); //IS IT THE CENTER OF THE OBJECT? (did I take transformations on BBOX into account?)
 	//Update Camera
-	myScene._camera.UpdateViewer();	
+	myScene._camera.UpdateViewer();
 	renderer._objectChanged = true;
 }
 

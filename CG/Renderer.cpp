@@ -34,7 +34,7 @@ void Renderer::RenderScene(Scene& scene) {
 		- Clipping
 		- Choose Rendering Type and Render Object
 		- Additional Rendering Options
-	*/	
+	*/
 	//Clear Pixels
 	_pixels.clear();
 	std::fill(_zBuffer.begin(), _zBuffer.end(), std::numeric_limits<float>::max());
@@ -50,7 +50,7 @@ void Renderer::RenderScene(Scene& scene) {
 		//Viewport Transform
 		point = FinalMatrix * point;
 		//Clipping
-		
+
 		//Perspective Divide
 		point = (point.w == 0) ? point : point / point.w;
 		//Update Z-Buffer at index x + y * width
@@ -59,6 +59,75 @@ void Renderer::RenderScene(Scene& scene) {
 			continue;
 		_zBuffer[index] = std::min(_zBuffer[index], point.z);
 	}
+	/*
+	if (_wireframe) {
+		//Adjust to Viewport
+		for (glm::vec4& point : objFinal._meshModel._points) { // CHANGE TO ITERATE OVER FACES INSTEAD OF POINTS
+			//Viewport Transform
+			point = FinalMatrix * point;
+			//Clipping
+
+			//Perspective Divide
+			point = (point.w == 0) ? point : point / point.w;
+			//Update Z-Buffer at index x + y * width
+			int index = std::round(static_cast<int>(point.x)) + std::round(static_cast<int>(point.y)) * _width;
+			if (index > _zBuffer.size())
+				continue;
+			_zBuffer[index] = std::min(_zBuffer[index], point.z);
+		}
+	}
+	else {
+		for (auto& faceNormal : objFinal._meshModel._faceNormals) {
+			glm::vec4& point1 = objFinal._meshModel._points[faceNormal.first[0]];
+			glm::vec4& point2 = objFinal._meshModel._points[faceNormal.first[1]];
+			glm::vec4& point3 = objFinal._meshModel._points[faceNormal.first[2]];
+			//Viewport Transform
+			point1 = FinalMatrix * point1;
+			point2 = FinalMatrix * point2;
+			point3 = FinalMatrix * point3;
+
+			bool outside = false;
+			if (point1.x < -point1.w && point2.x < -point2.w && point3.x < -point3.w) {
+				outside = true;
+			}
+			if (point1.x > point1.w && point2.x > point2.w && point3.x > point3.w) {
+				outside = true;
+			}
+			if (point1.y < -point1.w && point2.y < -point2.w && point3.y < -point3.w) {
+				outside = true;
+			}
+			if (point1.y > point1.w && point2.y > point2.w && point3.y > point3.w) {
+				outside = true;
+			}
+			if (point1.z < -point1.w && point2.z < -point2.w && point3.z < -point3.w) {
+				outside = true;
+			}
+			if (point1.z > point1.w && point2.z > point2.w && point3.z > point3.w) {
+				outside = true;
+			}
+
+			if (!outside) {
+				//Transform Point
+
+				//Clipping
+				//Perspective Divide
+				point1 = (point1.w == 0) ? point1 : point1 / point1.w;
+				point2 = (point2.w == 0) ? point2 : point2 / point2.w;
+				point3 = (point3.w == 0) ? point3 : point3 / point3.w;
+				//Update Z-Buffer at index x + y * width
+				int index1 = std::round(static_cast<int>(point1.x)) + std::round(static_cast<int>(point1.y)) * _width;
+				int index2 = std::round(static_cast<int>(point2.x)) + std::round(static_cast<int>(point2.y)) * _width;
+				int index3 = std::round(static_cast<int>(point3.x)) + std::round(static_cast<int>(point3.y)) * _width;
+				if (index1 > _zBuffer.size() || index2 > _zBuffer.size() || index3 > _zBuffer.size())
+					continue;
+				_zBuffer[index1] = std::min(_zBuffer[index1], point1.z);
+				_zBuffer[index2] = std::min(_zBuffer[index2], point1.z);
+				_zBuffer[index3] = std::min(_zBuffer[index3], point1.z);
+
+			}
+		}
+	}
+	*/
 
 	//Transform Normals 
 	for (pair<std::array<int, 3>, glm::vec4>& point : objFinal._meshModel._faceNormals) {
@@ -73,33 +142,33 @@ void Renderer::RenderScene(Scene& scene) {
 	//2nd object to save point at world coordinates
 	Object obj_world_coordinates = scene.getObject();
 	glm::mat4 WorldMatrix = scene.GenerateWorld();
-	for (glm::vec4& point : obj_world_coordinates._meshModel._points) { 
+	for (glm::vec4& point : obj_world_coordinates._meshModel._points) {
 		//Viewport Transform
-		point = WorldMatrix * point;		
+		point = WorldMatrix * point;
 	}
-	
+
 	//Choose Rendering Type (Wireframe/Shading type)
 	switch (_renderType) {
 	case RenderType::Wireframe:
 		RenderWireframe(objFinal);
 		break;
-	
+
 	case RenderType::FlatShading:
 		//Hidden Surface Removal
 
-		_shader.RenderFlatShading(scene, _pixels , objFinal, obj_world_coordinates, _zBuffer, _width, _height);
+		_shader.RenderFlatShading(scene, _pixels, objFinal, obj_world_coordinates, _zBuffer, _width, _height);
 		break;
-	
+
 	case RenderType::GouraudShading:
 		//Hidden Surface Removal
 
-		_shader.RenderGouraudShading(scene, _pixels);
+		_shader.RenderGouraudShading(scene, _pixels, objFinal, obj_world_coordinates, _zBuffer, _width, _height);
 		break;
-	
+
 	case RenderType::PhongShading:
 		//Hidden Surface Removal
 
-		_shader.RenderPhongShading(scene, _pixels);
+		_shader.RenderPhongShading(scene, _pixels, objFinal, obj_world_coordinates, _zBuffer, _width, _height);
 		break;
 	}
 
