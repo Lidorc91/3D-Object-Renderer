@@ -21,7 +21,7 @@ mono_crash.*
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
-x64/
+x64/    
 x86/
 [Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/
@@ -32,6 +32,11 @@ bld/
 [Oo]ut/
 [Ll]og/
 [Ll]ogs/
+
+# But track specific .lib files
+!Debug/freeglut_staticd.lib
+!Release/freeglut_static.lib
+
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
